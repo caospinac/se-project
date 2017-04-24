@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}Inicio{% endblock %} - SE Project</title>
+
+    <!-- Bootstrap -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-theme.css" rel="stylesheet">
+
+    <!-- siimple style -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+    
+    <!-- =======================================================
+        Theme Name: Siimple
+        Theme URL: https://bootstrapmade.com/free-bootstrap-landing-page/
+        Author: BootstrapMade
+        Author URL: https://bootstrapmade.com
+    ======================================================= -->
+  </head>
+
+  <body>
+  {% block body %}
+
+  <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">Science <span>network</span></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+          {% block user %}
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign up</a></li>
+            <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-log-in"></span> Sign in</a>
+              <div class="dropdown-menu" style="padding: 15px; padding-bottom: 10px; width: 350px">
+              <form class="form-horizontal" method="post" accept-charset="UTF-8" id="sign-in-form">
+                <div class="input-group">
+                  <span class="input-group-addon glyphicon glyphicon-user" id="email-addon"></span>
+                  <input type="text" name="email" class="form-control login" placeholder="Email" aria-describedby="email-addon">
+                </div>
+                <div class="input-group">
+                  <span class="input-group-addon glyphicon glyphicon-lock" id="password-addon"></span>
+                  <input type="password" name="password" class="form-control login" placeholder="Password" aria-describedby="password-addon">
+                </div>
+                <input class="btn" type="submit" name="submit" value="Login">
+              </form>
+              </div>
+            </li>
+          {% endblock %}
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div id="header">
+		<div class="container">
+    {% block content %}
+			<div class="row">
+				<div class="col-lg-4">
+					<h1>Science network</h1>
+					<h2 class="subtitle">A tool to optimize your searches</h2>
+					<form class="form-inline signup" role="form">
+					  <div class="form-group">
+					    <input type="text" class="form-control" id="name" placeholder="What's your name?" autocomplete="off">
+					  </div>
+					  <button type="submit" class="btn btn-theme">Ephemeral session</button>
+					</form>					
+				</div>
+				<div class="col-lg-6 col-lg-offset-2">
+          <h1>First steps</h1>
+          <p>Visit the site <a href="http://www.webofknowledge.com/" target="_blank">www.webofknowledge.com</a></p>
+          <p>
+            Or if you are a member of the national university of colombia,
+            visit <a href="http://www.webofknowledge.com.ezproxy.unal.edu.co" target="_blank">
+            www.webofknowledge.com.ezproxy.unal.edu.co</a>
+          </p>
+					<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+					  <ol class="carousel-indicators">
+						<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+						<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+						<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+					  </ol>					
+					  <!-- slides -->
+					  <div class="carousel-inner">
+						<div class="item active">
+						  <img src="assets/img/step-1.png" alt="">
+						</div>
+						<div class="item">
+						  <img src="assets/img/step-2.png" alt="">
+						</div>
+            <div class="item">
+              <img src="assets/img/step-3.png" alt="">
+            </div>
+            <div class="item">
+              <img src="assets/img/step-4.png" alt="">
+            </div>
+					  </div>
+					</div>		
+				</div>
+				
+			</div>
+
+    {% endblock %}
+		</div>
+	</div>
+	<div id="footer">
+	<div class="container">
+    {% block footer %}
+		<div class="row">
+			<div class="col-md-6">
+	            <p class="copyright">&copy; 2017 Science Network</p>
+			</div>
+            <div class="col-md-6">
+                <div class="credits">
+                    <!-- 
+                        All the links in the footer should remain intact. 
+                        You can delete the links only if you purchased the pro version.
+                        Licensing information: https://bootstrapmade.com/license/
+                        Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=Siimple
+                    -->
+                    <a href="https://github.com/carlosaospinac/se-project" target="_blank"><b>Source code</b></a> by
+                    <ul class="list-inline">
+                      <li>Carlos A. Ospina</li>
+                      <li>Daniel S. Valencia</li>
+                      <li>Mauricio Soche</li>
+                    </ul>
+                </div>
+            </div>
+		</div>		
+	</div>	
+	</div>
+
+  {% endblock %}
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/jquery.easing.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+  {% endblock %}
+</body>
+</html>
