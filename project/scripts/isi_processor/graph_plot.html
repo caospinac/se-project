@@ -65,11 +65,15 @@
                 }
             };
             network = new vis.Network(container, data, options);
+            network.on('doubleClick', function(params) {
+                document.getElementById('selection').innerHTML = 'Selection: ' + nodes[params.nodes].toSource();
+            });
         }
     </script>
 </head>
 
 <body onload="draw();">
     <div id="mynetwork"></div>
+    <p id="selection"></p>
 </body>
 </html>
