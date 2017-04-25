@@ -141,20 +141,22 @@ class TreeOfScience():
                 return vs.indegree()
 
         tree_indices = [z for x in tree.values() for z in x]
-        self.graph.vs["group"] = [
-            key
-            for x in self.graph.vs.indices
-            for key in tree
-            if x in tree[key]
-        ]
-
+        self.graph.vs["group"] = ["None"]*self.graph.vcount()
+        for key in tree:
+            for vs_index in tree[key]:
+                self.graph.vs[vs_index]["group"] = key
         tree_graph = self.graph.subgraph(tree_indices)
         tree_graph.vs["id"] = tree_graph.vs.indices
         tree_graph.vs["label"] = tree_graph.vs["group"]
         tree_graph.vs["value"] = [
             get_indicator_by_group(vs)
-            for vs in self.graph.vs
+            for vs in tree_graph.vs
         ]
+        ig.plot(
+            tree_graph,
+            layout="fr",
+            vertex_colors="black",
+        )
         return tree_graph
 
 
