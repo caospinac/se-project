@@ -1,86 +1,78 @@
 <!doctype html>
 <html>
 <head>
-  <title>Network | Playing with Physics</title>
+    <title>Network | Playing with Physics</title>
 
-  <style type="text/css">
-    body {
-      font: 10pt sans;
-    }
-    #mynetwork {
-      float:left;
-      width: 1000px;
-      height: 1000px;
-      margin:5px;
-      border: 1px solid lightgray;
-    }
-    #config {
-      float:left;
-      width: 400px;
-      height: 600px;
-    }
-  </style>
-
-
-  <script type="text/javascript" src="exampleUtil.js"></script>
-  <script type="text/javascript" src="vis.js"></script>
-  <link href="vis.css" rel="stylesheet" type="text/css" />
-
-<script type="text/javascript">
-    var nodes = null;
-    var edges = null;
-    var network = null;
-
-    function draw() {
-      // create people.
-      // value corresponds with the age of the person
-      nodes = {{nodes}};
-
-      // create connections between people
-      // value corresponds with the amount of contact between two people
-      edges = {{edges}};
-
-      // Instantiate our network object.
-      var container = document.getElementById('mynetwork');
-
-      var data = {
-        nodes: nodes,
-        edges: edges
-      };
-
-      var options = {
-        edges:{
-          arrows: {
-            to: {enabled: true, scaleFactor:0.05, type:'arrow'}
-          },
-          width: 0.05
-        },
-        nodes: {
-          shape: 'dot',
-          font: {
-            size: 12,
-            face: 'Tahoma'
-          },
-        },
-        physics: {
-            forceAtlas2Based: {
-                gravitationalConstant: -26,
-                centralGravity: 0.005,
-                springLength: 230,
-                springConstant: 0.18
-            },
-            maxVelocity: 146,
-            solver: 'forceAtlas2Based',
-            timestep: 0.35,
-            stabilization: {iterations: 150}
+    <style type="text/css">
+        body {
+            font: 10pt sans;
         }
-      };
-      network = new vis.Network(container, data, options);
-    }
-  </script>
+        #mynetwork {
+            float:left;
+            width: 1000px;
+            height: 1000px;
+            margin:5px;
+            border: 1px solid lightgray;
+        }
+        #config {
+            float:left;
+            width: 400px;
+            height: 600px;
+        }
+    </style>
+
+    <script type="text/javascript" src="exampleUtil.js"></script>
+    <script type="text/javascript" src="vis.js"></script>
+    <link href="vis.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript">
+        var nodes = null;
+        var edges = null;
+        var network = null;
+
+        function draw() {
+            nodes = {{nodes}};
+            edges = {{edges}};
+
+            var container = document.getElementById('mynetwork');
+
+            var data = {
+                nodes: nodes,
+                edges: edges
+            };
+
+        var options = {
+            nodes: {
+                shape: 'dot',
+                font: {
+                    face: 'Tahoma'
+                }
+            },
+            edges: {
+                width: 0.15,
+                smooth: {
+                    type: 'continuous'
+                }
+            },
+            interaction: {
+                tooltipDelay: 200,
+                hideEdgesOnDrag: true
+            },
+            physics: {
+                stabilization: false,
+                barnesHut: {
+                    gravitationalConstant: -10000,
+                    springConstant: 0.002,
+                    springLength: 150
+                }
+            }
+        };
+            network = new vis.Network(container, data, options);
+        }
+    </script>
 </head>
 
 <body onload="draw();">
-<div id="mynetwork"></div>
+    <div id="mynetwork"></div>
 </body>
 </html>

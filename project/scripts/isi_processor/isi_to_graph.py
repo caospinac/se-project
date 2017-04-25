@@ -126,35 +126,47 @@ class TreeOfScience():
 
         return indices
 
-    def get_tree_coordinates(self):
+    def get_tree_graph(self):
         tree = {
             "leave": self.leave(),
             "trunk": self.trunk(),
             "root": self.root()
         }
+        def get_indicator_by_group(vs):
+            if vs["group"] == "leave":
+                return vs.outdegree()
+            elif vs["group"] == "trunk":
+                return vs.betweenness()
+            elif vs["group"] == "root":
+                return vs.indegree()
+
         tree_indices = [z for x in tree.values() for z in x]
-        self.graph.vs["type"] = [
+        self.graph.vs["group"] = [
             key
             for x in self.graph.vs.indices
             for key in tree
             if x in tree[key]
         ]
+
         tree_graph = self.graph.subgraph(tree_indices)
         tree_graph.vs["id"] = tree_graph.vs.indices
-        tree_graph.vs["group"] = [x["type"] for x in tree_graph.vs]
-        ig.plot(tree_graph, layout="fr")
+        tree_graph.vs["label"] = tree_graph.vs["group"]
+        tree_graph.vs["value"] = [
+            get_indicator_by_group(vs)
+            for vs in self.graph.vs
+        ]
         return tree_graph
 
 
 if __name__ == '__main__':
     tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
-    graph_tree = tree.get_tree_coordinates()
-    # print('Leave:')
-    # pprint([tree.graph.vs['DI'][x] for x in tree.leave()])
-    # print('Trunk:')
-    # pprint([tree.graph.vs['DI'][x] for x in tree.trunk()])
-    # print('Root:')
-    # pprint([tree.graph.vs['DI'][x] for x in tree.root()])
+    graph_tree = tree.get_tree_graph()
+    print('Leave:')
+    pprint([tree.graph.vs['title'][x] for x in tree.leave()])
+    print('Trunk:')
+    pprint([tree.graph.vs['title'][x] for x in tree.trunk()])
+    print('Root:')
+    pprint([tree.graph.vs['title'][x] for x in tree.root()])
 
     from jinja2 import Environment, FileSystemLoader
     import json
@@ -172,30 +184,6 @@ if __name__ == '__main__':
         }
         for es in graph_tree.es
     ]
-
-
-
-    """
-    pprint(
-        [
-            (graph_tree.es[
-                graph_tree.get_eid(
-                    x.tuple[0],
-                    x.tuple[1]
-                )
-            ].source,
-            graph_tree.es[
-                graph_tree.get_eid(
-                    x.tuple[0],
-                    x.tuple[1]
-                )
-            ].target
-            )
-            for x in graph_tree.es
-        ]
-    )
-    pprint(edges)
-    """
 
     env = Environment(
         loader=FileSystemLoader(""),
