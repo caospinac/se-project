@@ -54,12 +54,21 @@ class TreeOfScience():
             for line in unique_labels
         ]
 
-        for key in ['AU', 'DI', 'PG', 'PY', 'SO', 'VL', ]:
+        for key in ['AU', 'DI', 'PG', 'PY', 'SO', 'VL']:
             self.graph.vs[key] = [
                 article[key] for article in classified_labels
             ]
 
-        self.graph.vs['betweenness'] = self.graph.betweenness()
+        self.graph.vs["title"] = [
+            ", ".join(
+                [
+                    x for x in vs.attributes().values() if x != None
+                ]
+            )
+            for vs in self.graph.vs
+        ]
+
+        self.graph.vs["id"] = self.graph.vs.indices
 
     def __preprocess_graph(self):
         valid_vs = self.graph.vs.select(
@@ -92,7 +101,7 @@ class TreeOfScience():
 
         items = zip(
             self.graph.vs.indices,
-            self.graph.vs['betweenness'],
+            self.graph.betweenness(),
         )
 
         sorted_items = sorted(items, key=itemgetter(1), reverse=True)
@@ -118,18 +127,84 @@ class TreeOfScience():
         return indices
 
     def get_tree_coordinates(self):
-        tree_indices = self.leave() + self.trunk() + self.root()
+        tree = {
+            "leave": self.leave(),
+            "trunk": self.trunk(),
+            "root": self.root()
+        }
+        tree_indices = [z for x in tree.values() for z in x]
+        self.graph.vs["type"] = [
+            key
+            for x in self.graph.vs.indices
+            for key in tree
+            if x in tree[key]
+        ]
         tree_graph = self.graph.subgraph(tree_indices)
-        tree_graph.write_dot("target_path.dot")
-        tree_graph.write("target_path.graphml")
+        tree_graph.vs["id"] = tree_graph.vs.indices
+        tree_graph.vs["group"] = [x["type"] for x in tree_graph.vs]
+        ig.plot(tree_graph, layout="fr")
+        return tree_graph
 
 
 if __name__ == '__main__':
     tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
-    tree.get_tree_coordinates()
-    print('Leave:')
-    pprint([tree.graph.vs['DI'][x] for x in tree.leave()])
-    print('Trunk:')
-    pprint([tree.graph.vs['DI'][x] for x in tree.trunk()])
-    print('Root:')
-    pprint([tree.graph.vs['DI'][x] for x in tree.root()])
+    graph_tree = tree.get_tree_coordinates()
+    # print('Leave:')
+    # pprint([tree.graph.vs['DI'][x] for x in tree.leave()])
+    # print('Trunk:')
+    # pprint([tree.graph.vs['DI'][x] for x in tree.trunk()])
+    # print('Root:')
+    # pprint([tree.graph.vs['DI'][x] for x in tree.root()])
+
+    from jinja2 import Environment, FileSystemLoader
+    import json
+
+    nodes = [
+        vs.attributes()
+        for vs in graph_tree.vs
+    ]
+
+    edges = [
+        {
+            "from": es.tuple[0],
+            "to": es.tuple[1],
+            "arrows":'to'
+        }
+        for es in graph_tree.es
+    ]
+
+
+
+    """
+    pprint(
+        [
+            (graph_tree.es[
+                graph_tree.get_eid(
+                    x.tuple[0],
+                    x.tuple[1]
+                )
+            ].source,
+            graph_tree.es[
+                graph_tree.get_eid(
+                    x.tuple[0],
+                    x.tuple[1]
+                )
+            ].target
+            )
+            for x in graph_tree.es
+        ]
+    )
+    pprint(edges)
+    """
+
+    env = Environment(
+        loader=FileSystemLoader(""),
+    )
+
+    html_content = env.get_template("graph_plot.html").render(
+        nodes=json.dumps(nodes),
+        edges=json.dumps(edges)
+    )
+
+    with open("my_new_file.html", "w+") as fh:
+        fh.write(html_content)

@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+  <title>Network | Playing with Physics</title>
+
+  <style type="text/css">
+    body {
+      font: 10pt sans;
+    }
+    #mynetwork {
+      float:left;
+      width: 1000px;
+      height: 1000px;
+      margin:5px;
+      border: 1px solid lightgray;
+    }
+    #config {
+      float:left;
+      width: 400px;
+      height: 600px;
+    }
+  </style>
+
+
+  <script type="text/javascript" src="exampleUtil.js"></script>
+  <script type="text/javascript" src="vis.js"></script>
+  <link href="vis.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    var nodes = null;
+    var edges = null;
+    var network = null;
+
+    function draw() {
+      // create people.
+      // value corresponds with the age of the person
+      nodes = [{"PY": "2005", "SO": "J BUS VENTURING", "VL": "V20", "type": "root", "title": "2005, J BUS VENTURING, V20, Wiklund J, P71, DOI 10.1016/j.jbusvent.2004.01.001", "group": "root", "PG": "P71", "id": 0, "AU": "Wiklund J", "DI": "DOI 10.1016/j.jbusvent.2004.01.001"}, {"PY": "2006", "SO": "INT MARKET REV", "VL": "V23", "type": "root", "title": "2006, INT MARKET REV, V23, Kropp F, P504, DOI 10.1108/02651330610703427", "group": "root", "PG": "P504", "id": 1, "AU": "Kropp F", "DI": "DOI 10.1108/02651330610703427"}, {"PY": "2001", "SO": "ORGAN SCI", "VL": "V12", "type": "leave", "title": "2001, ORGAN SCI, V12, Ko A., P54, DOI DOI 10.1287/0RSC.12.1.54.10121", "group": "leave", "PG": "P54", "id": 2, "AU": "Ko A.", "DI": "DOI DOI 10.1287/0RSC.12.1.54.10121"}, {"PY": "1990", "SO": "J MARKETING", "VL": "V54", "type": "leave", "title": "1990, J MARKETING, V54, NARVER JC, P20, DOI 10.2307/1251757", "group": "leave", "PG": "P20", "id": 3, "AU": "NARVER JC", "DI": "DOI 10.2307/1251757"}, {"PY": "2011", "SO": "IND MARKET MANAG", "VL": "V40", "type": "root", "title": "2011, IND MARKET MANAG, V40, Lisboa A, P1274, DOI 10.1016/j.indmarman.2011.10.013", "group": "root", "PG": "P1274", "id": 4, "AU": "Lisboa A", "DI": "DOI 10.1016/j.indmarman.2011.10.013"}, {"PY": "1996", "SO": "ACAD MANAGE REV", "VL": "V21", "type": "root", "title": "1996, ACAD MANAGE REV, V21, Lumpkin GT, P135, DOI 10.2307/258632", "group": "root", "PG": "P135", "id": 5, "AU": "Lumpkin GT", "DI": "DOI 10.2307/258632"}, {"PY": "2010", "SO": "ENTREP REGION DEV", "VL": "V22", "type": "root", "title": "2010, ENTREP REGION DEV, V22, Tolstoy D, P379, DOI 10.1080/08985620903168273", "group": "root", "PG": "P379", "id": 6, "AU": "Tolstoy D", "DI": "DOI 10.1080/08985620903168273"}, {"PY": "1983", "SO": "MANAGE SCI", "VL": "V29", "type": "root", "title": "1983, MANAGE SCI, V29, MILLER D, P770, DOI 10.1287/mnsc.29.7.770", "group": "root", "PG": "P770", "id": 7, "AU": "MILLER D", "DI": "DOI 10.1287/mnsc.29.7.770"}, {"PY": "2011", "SO": "INT J MANAG REV", "VL": "V13", "type": "trunk", "title": "2011, INT J MANAG REV, V13, Hakala H, P199, DOI 10.1111/j.1468-2370.2010.00292.x", "group": "trunk", "PG": "P199", "id": 8, "AU": "Hakala H", "DI": "DOI 10.1111/j.1468-2370.2010.00292.x"}, {"PY": "1993", "SO": "J MARKETING", "VL": "V57", "type": "root", "title": "1993, J MARKETING, V57, JAWORSKI BJ, P53, DOI 10.2307/1251854", "group": "root", "PG": "P53", "id": 9, "AU": "JAWORSKI BJ", "DI": "DOI 10.2307/1251854"}, {"PY": "2009", "SO": "J SMALL BUS MANAGE", "VL": "V47", "type": "root", "title": "2009, J SMALL BUS MANAGE, V47, Baker WE, P443", "group": "root", "PG": "P443", "id": 10, "AU": "Baker WE", "DI": null}, {"PY": "2016", "SO": "J SMALL BUS MANAGE", "VL": "V54", "type": "leave", "title": "2016, J SMALL BUS MANAGE, V54, Perez-Luno A, P262, DOI 10.1111/jsbm.12144", "group": "leave", "PG": "P262", "id": 11, "AU": "Perez-Luno A", "DI": "DOI 10.1111/jsbm.12144"}, {"PY": "2016", "SO": "INT ENTREP MANAG J", "VL": "V12", "type": "root", "title": "2016, INT ENTREP MANAG J, V12, Huang HC, P1, DOI 10.1007/s11365-014-0321-8", "group": "root", "PG": "P1", "id": 12, "AU": "Huang HC", "DI": "DOI 10.1007/s11365-014-0321-8"}, {"PY": "2016", "SO": "IND INNOV", "VL": "V23", "type": "trunk", "title": "2016, IND INNOV, V23, Choi SB, P673, DOI 10.1080/13662716.2016.1208552", "group": "trunk", "PG": "P673", "id": 13, "AU": "Choi SB", "DI": "DOI 10.1080/13662716.2016.1208552"}, {"PY": "2016", "SO": "NANKAI BUS REV NT", "VL": "V7", "type": "root", "title": "2016, NANKAI BUS REV NT, V7, Amin M, P39, DOI 10.1108/NBRI-08-2015-0019", "group": "root", "PG": "P39", "id": 14, "AU": "Amin M", "DI": "DOI 10.1108/NBRI-08-2015-0019"}, {"PY": "1981", "SO": "J MARKETING RES", "VL": "V18", "type": "root", "title": "1981, J MARKETING RES, V18, FORNELL C, P382, DOI 10.2307/3150980", "group": "root", "PG": "P382", "id": 15, "AU": "FORNELL C", "DI": "DOI 10.2307/3150980"}, {"PY": "2016", "SO": "INTERNET RES", "VL": "V26", "type": "leave", "title": "2016, INTERNET RES, V26, Yu XY, P402, DOI 10.1108/IntR-10-2014-0265", "group": "leave", "PG": "P402", "id": 16, "AU": "Yu XY", "DI": "DOI 10.1108/IntR-10-2014-0265"}, {"PY": "1989", "SO": "STRATEGIC MANAGE J", "VL": "V10", "type": "root", "title": "1989, STRATEGIC MANAGE J, V10, COVIN JG, P75, DOI 10.1002/smj.4250100107", "group": "root", "PG": "P75", "id": 17, "AU": "COVIN JG", "DI": "DOI 10.1002/smj.4250100107"}, {"PY": "2016", "SO": "INT FOOD AGRIBUS MAN", "VL": "V19", "type": "root", "title": "2016, INT FOOD AGRIBUS MAN, V19, Mirzaei O, P99", "group": "root", "PG": "P99", "id": 18, "AU": "Mirzaei O", "DI": null}, {"PY": "2005", "SO": "J BUS RES", "VL": "V58", "type": "root", "title": "2005, J BUS RES, V58, Bhuian SN, P9, DOI 10.1016/S0148-2963(03)00074-2", "group": "root", "PG": "P9", "id": 19, "AU": "Bhuian SN", "DI": "DOI 10.1016/S0148-2963(03)00074-2"}, {"PY": "2002", "SO": "J MARKETING", "VL": "V66", "type": "root", "title": "2002, J MARKETING, V66, Matsuno K, P18, DOI 10.1509/jmkg.66.3.18.18507", "group": "root", "PG": "P18", "id": 20, "AU": "Matsuno K", "DI": "DOI 10.1509/jmkg.66.3.18.18507"}, {"PY": "2009", "SO": "J SMALL BUS MANAGE", "VL": "V47", "type": "trunk", "title": "2009, J SMALL BUS MANAGE, V47, Renko M, P331", "group": "trunk", "PG": "P331", "id": 21, "AU": "Renko M", "DI": null}, {"PY": "2008", "SO": "J SMALL BUS MANAGE", "VL": "V46", "type": "trunk", "title": "2008, J SMALL BUS MANAGE, V46, Hills GE, P99, DOI 10.1111/j.1540-627X.2007.00234.x", "group": "trunk", "PG": "P99", "id": 22, "AU": "Hills GE", "DI": "DOI 10.1111/j.1540-627X.2007.00234.x"}, {"PY": "2000", "SO": "ACAD MANAGE REV", "VL": "V25", "type": "root", "title": "2000, ACAD MANAGE REV, V25, Shane S, P217, DOI 10.5465/amr.2000.2791611", "group": "root", "PG": "P217", "id": 23, "AU": "Shane S", "DI": "DOI 10.5465/amr.2000.2791611"}, {"PY": "2015", "SO": "INT SMALL BUS J", "VL": "V33", "type": "root", "title": "2015, INT SMALL BUS J, V33, Morgan T, P731, DOI 10.1177/0266242614521054", "group": "root", "PG": "P731", "id": 24, "AU": "Morgan T", "DI": "DOI 10.1177/0266242614521054"}, {"PY": "2006", "SO": "EUR J MARKETING", "VL": "V40", "type": "root", "title": "2006, EUR J MARKETING, V40, Miles MP, P485, DOI 10.1108/03090560610657804", "group": "root", "PG": "P485", "id": 25, "AU": "Miles MP", "DI": "DOI 10.1108/03090560610657804"}, {"PY": "1990", "SO": "J MARKETING", "VL": "V54", "type": "trunk", "title": "1990, J MARKETING, V54, KOHLI AK, P1, DOI 10.2307/1251866", "group": "trunk", "PG": "P1", "id": 26, "AU": "KOHLI AK", "DI": "DOI 10.2307/1251866"}, {"PY": "2016", "SO": "J BUS RES", "VL": "V69", "type": "trunk", "title": "2016, J BUS RES, V69, Martin SL, P2040, DOI 10.1016/j.jbusres.2015.10.149", "group": "trunk", "PG": "P2040", "id": 27, "AU": "Martin SL", "DI": "DOI 10.1016/j.jbusres.2015.10.149"}, {"PY": "2008", "SO": "J SMALL BUS MANAGE", "VL": "V46", "type": "trunk", "title": "2008, J SMALL BUS MANAGE, V46, Li Y, P113, DOI 10.1111/j.1540-627X.2007.00235.x", "group": "trunk", "PG": "P113", "id": 28, "AU": "Li Y", "DI": "DOI 10.1111/j.1540-627X.2007.00235.x"}, {"PY": "2014", "SO": "J INT MARKETING", "VL": "V22", "type": "trunk", "title": "2014, J INT MARKETING, V22, De Clercq D, P47", "group": "trunk", "PG": "P47", "id": 29, "AU": "De Clercq D", "DI": null}];
+
+      // create connections between people
+      // value corresponds with the amount of contact between two people
+      edges = [{"to": 0, "arrows": "to", "from": 1}, {"to": 2, "arrows": "to", "from": 1}, {"to": 3, "arrows": "to", "from": 1}, {"to": 5, "arrows": "to", "from": 1}, {"to": 7, "arrows": "to", "from": 1}, {"to": 9, "arrows": "to", "from": 1}, {"to": 17, "arrows": "to", "from": 1}, {"to": 26, "arrows": "to", "from": 1}, {"to": 5, "arrows": "to", "from": 4}, {"to": 7, "arrows": "to", "from": 4}, {"to": 10, "arrows": "to", "from": 4}, {"to": 15, "arrows": "to", "from": 4}, {"to": 17, "arrows": "to", "from": 4}, {"to": 21, "arrows": "to", "from": 4}, {"to": 0, "arrows": "to", "from": 8}, {"to": 1, "arrows": "to", "from": 8}, {"to": 2, "arrows": "to", "from": 8}, {"to": 3, "arrows": "to", "from": 8}, {"to": 5, "arrows": "to", "from": 8}, {"to": 7, "arrows": "to", "from": 8}, {"to": 9, "arrows": "to", "from": 8}, {"to": 10, "arrows": "to", "from": 8}, {"to": 17, "arrows": "to", "from": 8}, {"to": 19, "arrows": "to", "from": 8}, {"to": 26, "arrows": "to", "from": 8}, {"to": 28, "arrows": "to", "from": 8}, {"to": 3, "arrows": "to", "from": 10}, {"to": 5, "arrows": "to", "from": 10}, {"to": 7, "arrows": "to", "from": 10}, {"to": 9, "arrows": "to", "from": 10}, {"to": 15, "arrows": "to", "from": 10}, {"to": 17, "arrows": "to", "from": 10}, {"to": 20, "arrows": "to", "from": 10}, {"to": 23, "arrows": "to", "from": 10}, {"to": 26, "arrows": "to", "from": 10}, {"to": 0, "arrows": "to", "from": 11}, {"to": 2, "arrows": "to", "from": 11}, {"to": 3, "arrows": "to", "from": 11}, {"to": 5, "arrows": "to", "from": 11}, {"to": 7, "arrows": "to", "from": 11}, {"to": 8, "arrows": "to", "from": 11}, {"to": 10, "arrows": "to", "from": 11}, {"to": 17, "arrows": "to", "from": 11}, {"to": 21, "arrows": "to", "from": 11}, {"to": 28, "arrows": "to", "from": 11}, {"to": 4, "arrows": "to", "from": 12}, {"to": 5, "arrows": "to", "from": 12}, {"to": 7, "arrows": "to", "from": 12}, {"to": 15, "arrows": "to", "from": 12}, {"to": 23, "arrows": "to", "from": 12}, {"to": 0, "arrows": "to", "from": 13}, {"to": 3, "arrows": "to", "from": 13}, {"to": 5, "arrows": "to", "from": 13}, {"to": 7, "arrows": "to", "from": 13}, {"to": 8, "arrows": "to", "from": 13}, {"to": 9, "arrows": "to", "from": 13}, {"to": 10, "arrows": "to", "from": 13}, {"to": 15, "arrows": "to", "from": 13}, {"to": 17, "arrows": "to", "from": 13}, {"to": 20, "arrows": "to", "from": 13}, {"to": 23, "arrows": "to", "from": 13}, {"to": 26, "arrows": "to", "from": 13}, {"to": 0, "arrows": "to", "from": 14}, {"to": 1, "arrows": "to", "from": 14}, {"to": 3, "arrows": "to", "from": 14}, {"to": 5, "arrows": "to", "from": 14}, {"to": 7, "arrows": "to", "from": 14}, {"to": 9, "arrows": "to", "from": 14}, {"to": 10, "arrows": "to", "from": 14}, {"to": 15, "arrows": "to", "from": 14}, {"to": 17, "arrows": "to", "from": 14}, {"to": 20, "arrows": "to", "from": 14}, {"to": 26, "arrows": "to", "from": 14}, {"to": 28, "arrows": "to", "from": 14}, {"to": 0, "arrows": "to", "from": 16}, {"to": 3, "arrows": "to", "from": 16}, {"to": 5, "arrows": "to", "from": 16}, {"to": 7, "arrows": "to", "from": 16}, {"to": 15, "arrows": "to", "from": 16}, {"to": 17, "arrows": "to", "from": 16}, {"to": 20, "arrows": "to", "from": 16}, {"to": 23, "arrows": "to", "from": 16}, {"to": 26, "arrows": "to", "from": 16}, {"to": 0, "arrows": "to", "from": 18}, {"to": 3, "arrows": "to", "from": 18}, {"to": 5, "arrows": "to", "from": 18}, {"to": 7, "arrows": "to", "from": 18}, {"to": 9, "arrows": "to", "from": 18}, {"to": 10, "arrows": "to", "from": 18}, {"to": 15, "arrows": "to", "from": 18}, {"to": 17, "arrows": "to", "from": 18}, {"to": 21, "arrows": "to", "from": 18}, {"to": 26, "arrows": "to", "from": 18}, {"to": 2, "arrows": "to", "from": 19}, {"to": 3, "arrows": "to", "from": 19}, {"to": 9, "arrows": "to", "from": 19}, {"to": 15, "arrows": "to", "from": 19}, {"to": 17, "arrows": "to", "from": 19}, {"to": 3, "arrows": "to", "from": 20}, {"to": 5, "arrows": "to", "from": 20}, {"to": 7, "arrows": "to", "from": 20}, {"to": 9, "arrows": "to", "from": 20}, {"to": 17, "arrows": "to", "from": 20}, {"to": 26, "arrows": "to", "from": 20}, {"to": 0, "arrows": "to", "from": 21}, {"to": 2, "arrows": "to", "from": 21}, {"to": 3, "arrows": "to", "from": 21}, {"to": 5, "arrows": "to", "from": 21}, {"to": 7, "arrows": "to", "from": 21}, {"to": 9, "arrows": "to", "from": 21}, {"to": 17, "arrows": "to", "from": 21}, {"to": 20, "arrows": "to", "from": 21}, {"to": 26, "arrows": "to", "from": 21}, {"to": 28, "arrows": "to", "from": 21}, {"to": 25, "arrows": "to", "from": 22}, {"to": 0, "arrows": "to", "from": 24}, {"to": 2, "arrows": "to", "from": 24}, {"to": 3, "arrows": "to", "from": 24}, {"to": 5, "arrows": "to", "from": 24}, {"to": 7, "arrows": "to", "from": 24}, {"to": 9, "arrows": "to", "from": 24}, {"to": 10, "arrows": "to", "from": 24}, {"to": 17, "arrows": "to", "from": 24}, {"to": 19, "arrows": "to", "from": 24}, {"to": 20, "arrows": "to", "from": 24}, {"to": 21, "arrows": "to", "from": 24}, {"to": 26, "arrows": "to", "from": 24}, {"to": 28, "arrows": "to", "from": 24}, {"to": 2, "arrows": "to", "from": 25}, {"to": 5, "arrows": "to", "from": 25}, {"to": 7, "arrows": "to", "from": 25}, {"to": 17, "arrows": "to", "from": 25}, {"to": 20, "arrows": "to", "from": 25}, {"to": 23, "arrows": "to", "from": 25}, {"to": 0, "arrows": "to", "from": 27}, {"to": 4, "arrows": "to", "from": 27}, {"to": 5, "arrows": "to", "from": 27}, {"to": 7, "arrows": "to", "from": 27}, {"to": 9, "arrows": "to", "from": 27}, {"to": 17, "arrows": "to", "from": 27}, {"to": 2, "arrows": "to", "from": 28}, {"to": 5, "arrows": "to", "from": 28}, {"to": 7, "arrows": "to", "from": 28}, {"to": 9, "arrows": "to", "from": 28}, {"to": 15, "arrows": "to", "from": 28}, {"to": 17, "arrows": "to", "from": 28}, {"to": 19, "arrows": "to", "from": 28}, {"to": 1, "arrows": "to", "from": 29}, {"to": 5, "arrows": "to", "from": 29}, {"to": 9, "arrows": "to", "from": 29}, {"to": 15, "arrows": "to", "from": 29}, {"to": 17, "arrows": "to", "from": 29}, {"to": 20, "arrows": "to", "from": 29}];
+
+      // Instantiate our network object.
+      var container = document.getElementById('mynetwork');
+
+      var data = {
+        nodes: nodes,
+        edges: edges
+      };
+
+      var options = {
+        edges:{
+          arrows: {
+            to: {enabled: true, scaleFactor:0.05, type:'arrow'}
+          },
+          width: 0.05
+        },
+        nodes: {
+          shape: 'dot',
+          font: {
+            size: 12,
+            face: 'Tahoma'
+          },
+        },
+        physics: {
+            forceAtlas2Based: {
+                gravitationalConstant: -26,
+                centralGravity: 0.005,
+                springLength: 230,
+                springConstant: 0.18
+            },
+            maxVelocity: 146,
+            solver: 'forceAtlas2Based',
+            timestep: 0.35,
+            stabilization: {iterations: 150}
+        }
+      };
+      network = new vis.Network(container, data, options);
+    }
+  </script>
+</head>
+
+<body onload="draw();">
+<div id="mynetwork"></div>
+</body>
+</html>
