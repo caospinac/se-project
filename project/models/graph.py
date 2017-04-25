@@ -5,7 +5,7 @@ from .base import SciNet
 
 class Graph(SciNet.Entity):
     graId = PrimaryKey(str, 32)
-    graCount = Required(float)
+    graContent = Required(str)
 
     query = Required('Query')
     result = Optional('Result')

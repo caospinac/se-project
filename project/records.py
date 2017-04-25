@@ -25,9 +25,10 @@ def register_university():
     universities = [
         'Universidad Nacional de Colombia',
         'Universidad de Caldas',
-        'Universidad Autonoma',
-        'Universidad Catolica',
-        'Universidad de Manizales'
+        'Universidad Autónoma de Manizales',
+        'Universidad Católica de Manizales',
+        'Universidad de Manizales',
+        'Other'
     ]
     for x in universities:
         University(uniName=x, uniId=uuid4().hex)

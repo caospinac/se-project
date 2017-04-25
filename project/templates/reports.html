@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Start{% endblock %}
+
+{% block user_control %}
+<li><a href=""><span class="glyphicon glyphicon-user"></span> {{ name if name is defined else "Anonymous"}}</a></li>
+{% if role == "adm" %}
+<li><a href="/reports"><span class="glyphicon glyphicon-list"></span> Report</a></li>
+{% endif %}
+<li><a href="/sign-out"><span class="glyphicon glyphicon-log-out"></span> Exit</a></li>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 col-md-offset-3" enctype="multipart/form-data" action="/do">
+    <h1>Reports</h1>
+    <div class="form-content">
+      <form action="" method="get" accept-charset="utf-8">
+        <fieldset class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" autocomplete="off">
+          <small class="text-muted">It will only be a user.</small>
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="email">Date range</label>
+          <input type="date" name="date" value="" placeholder="">
+          <input type="date" name="date" value="" placeholder="">
+        </fieldset>
+          <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+<hr>
+{% endblock %}

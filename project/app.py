@@ -63,6 +63,9 @@ def ignore_404s(request, exception):
 
 @app.route("/", methods=['GET', 'POST'])
 async def index(request):
+    if request['session'].get('user'):
+        url = app.url_for("home")
+        return redirect(url)
     view = env.get_template("base.html")
     html_content = view.render()
     return html(html_content)
@@ -95,11 +98,13 @@ async def sign_in(request):
             login = pbkdf2_sha256.verify(f"{password}{SALT}", us.usePassword)
     except Exception as e:
         login = False
-    if login or not us:
+    if not login or not us:
+        url = app.url_for('index')
+    else:
         request['session']['user'] = us.useId
         request['session']['nickname'] = us.useNickName
         request['session']['auth'] = us.useType
-    url = app.url_for('home')
+        url = app.url_for('home')
     return redirect(url)
 
 
@@ -146,7 +151,55 @@ async def sign_out(request):
     return redirect(url)
 
 
+@app.route("/graph/<graId:\w{32}>", methods=['GET', 'POST'])
+async def graph(request):
+    user = request['session'].get('user')
+    if not user:
+        return self.response_status(401)
+    with db_session:
+        if id == 'all':
+            return self.response_status(
+                200, select(
+                    (l.id, l.name, l.state, l.city, l.address)
+                    for l in Land
+                    if l.user == User[user] and l.active
+                )
+            )
+        if not Land.exists(id=id):
+            return self.response_status(404)
+        return self.response_status(
+            200, select(
+                (l.name, l.state, l.city, l.address)
+                for l in Land if l.id == id and l.active
+            )
+        )
+    script = graph_script(request.file.body)
+    view = env.get_template("graph.html")
+    html_content = view.render(script=script)
+    return html(html_content)
 
+
+@app.route("/upload", methods=['POST', 'GET'])
+async def upload(request):
+    file = request.files.get('selectedFile')
+    try:
+        script = util.build_graph(file.body)
+        content = [(row[0], row[1:]) for row in content0]
+    except Exception as e:
+        raise e
+        content = []
+
+    template = env.get_template("input.html")
+    html_content = template.render(
+        uploaded=content, measure_labels=ms.labels)
+    return html(html_content)
+
+
+@app.route("/reports", methods=['POST', 'GET'])
+async def reports(request):
+    template = env.get_template("reports.html")
+    html_content = template.render()
+    return html(html_content)
 
 if __name__ == '__main__':
     sql_debug(app.config.SQL_DEBUG)
