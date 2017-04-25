@@ -117,11 +117,16 @@ class TreeOfScience():
 
         return indices
 
+    def get_tree_coordinates(self):
+        tree_indices = self.leave() + self.trunk() + self.root()
+        tree_graph = self.graph.subgraph(tree_indices)
+        tree_graph.write_dot("target_path.dot")
+        tree_graph.write("target_path.graphml")
+
 
 if __name__ == '__main__':
-    # <AQUI EL ARCHIVO!!!!!!!!!!!!
     tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    tree.get_tree_coordinates()
     print('Leave:')
     pprint([tree.graph.vs['DI'][x] for x in tree.leave()])
     print('Trunk:')
