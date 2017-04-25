@@ -3,8 +3,8 @@
 {% block title %}Start{% endblock %}
 
 {% block user_control %}
-<li><a href="#"><span class="glyphicon glyphicon-user"></span> {{ name if name is defined else "Anonymous"}}</a></li>
-<li><a href="/"><span class="glyphicon glyphicon-log-out"></span> Exit</a></li>
+<li><a href=""><span class="glyphicon glyphicon-user"></span> {{ name if name is defined else "Anonymous"}}</a></li>
+<li><a href="/sign-out"><span class="glyphicon glyphicon-log-out"></span> Exit</a></li>
 </li>
 {% endblock %}
 

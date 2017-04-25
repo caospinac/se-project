@@ -16,7 +16,7 @@
         <select class="form-control" id="university" name="university">
           <option disabled selected value> -- select a university -- </option>
         {% for univ in universities %}
-          <option value="{{ uni.uniId }}">{{ uni.uniName }}</option>
+          <option value="{{ univ.uniId }}">{{ univ.uniName }}</option>
         {% endfor %}
         </select>
       </fieldset>

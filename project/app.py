@@ -5,7 +5,7 @@ from passlib.hash import pbkdf2_sha256
 from pony.orm import *
 from sanic import Sanic
 from sanic.exceptions import NotFound, FileNotFound
-from sanic.response import html, json
+from sanic.response import html, json, redirect
 from sanic_session import InMemorySessionInterface
 
 from config import database, SALT, server
@@ -71,7 +71,8 @@ async def index(request):
 @app.route("/home", methods=['GET', 'POST'])
 async def home(request):
     view = env.get_template("home.html")
-    html_content = view.render()
+    name = request['session'].get('nickname')
+    html_content = view.render(name=name) if name else view.render()
     return html(html_content)
 
 
@@ -82,8 +83,28 @@ async def do(request):
     return html(html_content)
 
 
+@app.route("/sign-in", methods=['POST'])
+async def sign_in(request):
+    req = request.form
+    email = req.get('email')
+    password = req.get('password')
+    us = None
+    try:
+        with db_session:
+            us = User.select(lambda u: u.useEmail == email).first()
+            login = pbkdf2_sha256.verify(f"{password}{SALT}", us.usePassword)
+    except Exception as e:
+        login = False
+    if login or not us:
+        request['session']['user'] = us.useId
+        request['session']['nickname'] = us.useNickName
+        request['session']['auth'] = us.useType
+    url = app.url_for('home')
+    return redirect(url)
+
+
 @app.route("/sign-up", methods=['GET', 'POST'])
-async def do(request):
+async def sign_up(request):
     if request.method == 'POST':
         req = request.form
         try:
@@ -100,11 +121,10 @@ async def do(request):
                     )
                 )
                 request['session']['user'] = us.useId
+                request['session']['nickname'] = us.useNickName
                 request['session']['auth'] = us.useType
-                view = env.get_template("home.html")
-                html_content = view.render(
-                    name=User[request['session'].get('user')]
-                )
+            url = app.url_for('home')
+            return redirect(url)
         except Exception as e:
             raise e
     view = env.get_template("sign-up.html")
@@ -112,6 +132,20 @@ async def do(request):
         html_content = view.render(universities=select(x for x in University))
         return html(html_content)
     return json("Failed")
+
+
+@app.route("/sign-out", methods=['GET', 'POST'])
+async def sign_out(request):
+    try:
+        del request['session']['user']
+        del request['session']['nickname']
+        del request['session']['auth']
+    except KeyError as e:
+        pass
+    url = app.url_for('index')
+    return redirect(url)
+
+
 
 
 if __name__ == '__main__':
