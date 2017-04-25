@@ -1,14 +1,18 @@
+from uuid import uuid4
+
 from jinja2 import Environment, PackageLoader
+from passlib.hash import pbkdf2_sha256
 from pony.orm import *
 from sanic import Sanic
 from sanic.exceptions import NotFound, FileNotFound
-from sanic.response import html
+from sanic.response import html, json
 from sanic_session import InMemorySessionInterface
 
-from config import database, server
+from config import database, SALT, server
 from models import (
     SciNet,
-    User
+    User,
+    University
 )
 
 
@@ -22,6 +26,18 @@ env = Environment(
 )
 
 session_interface = InMemorySessionInterface()
+
+
+def not_null_data(**kw):
+    return dict(
+        (k, v)
+        for k, v in kw.items()
+        if v
+    )
+
+
+def crypt(value):
+    return pbkdf2_sha256.hash(f'{value}{SALT}')
 
 
 @app.middleware('request')
@@ -68,29 +84,34 @@ async def do(request):
 
 @app.route("/sign-up", methods=['GET', 'POST'])
 async def do(request):
-    req = request.form
-    try:
-        with db_session:
-            if User.exists(useEmail=req.get('email')):
-                return self.response_status(409)
-            uid = uuid4().hex
-            User(
-                **self.not_null_data(
-                    useId=uid,
-                    useNickName=req.get('nickname'),
-                    useArea=req.get('area'),
-                    usePassword=self.crypt(req.get('password')),
+    if request.method == 'POST':
+        req = request.form
+        try:
+            with db_session:
+                uid = uuid4().hex
+                us = User(
+                    **not_null_data(
+                        useId=uid,
+                        useNickName=req.get('nickname'),
+                        useArea=req.get('area'),
+                        useEmail=req.get('email'),
+                        usePassword=crypt(req.get('password')),
+                        university=University[req.get('university')]
+                    )
                 )
-            )
-            request['session']['user'] = us.id
-            request['session']['auth'] = us.useType
-    except Exception as e:
-        raise e
-    view = env.get_template("home.html")
-    html_content = view.render(
-        name=User[request['session'].get('user')]
-    )
-    return html(html_content)
+                request['session']['user'] = us.useId
+                request['session']['auth'] = us.useType
+                view = env.get_template("home.html")
+                html_content = view.render(
+                    name=User[request['session'].get('user')]
+                )
+        except Exception as e:
+            raise e
+    view = env.get_template("sign-up.html")
+    with db_session:
+        html_content = view.render(universities=select(x for x in University))
+        return html(html_content)
+    return json("Failed")
 
 
 if __name__ == '__main__':

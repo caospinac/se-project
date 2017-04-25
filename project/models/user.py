@@ -11,6 +11,7 @@ class User(SciNet.Entity):
     useNickName = Required(str, unique=True)
     useState = Required(str, default='active')
     useArea = Required(str)
+    useEmail = Required(str)
     usePassword = Required(str)
 
     university = Required('University')

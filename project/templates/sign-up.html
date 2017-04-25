@@ -10,29 +10,29 @@
 {% block content %}
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
-    <form action="/home" method="post" accept-charset="utf-8" id="sign-up-form">
+    <form action="" method="post" accept-charset="utf-8" id="sign-up-form">
       <fieldset class="form-group">
         <label for="university">University</label>
         <select class="form-control" id="university" name="university">
           <option disabled selected value> -- select a university -- </option>
         {% for univ in universities %}
-          <option value="{{ uni.id }}">{{ univ.name }}</option>
+          <option value="{{ uni.uniId }}">{{ uni.uniName }}</option>
         {% endfor %}
         </select>
       </fieldset>
       <fieldset class="form-group">
         <label for="nickname">Area</label>
-        <input type="text" class="form-control" id="area" placeholder="Enter area" autocomplete="off">
+        <input type="text" class="form-control" id="area" placeholder="Enter area" name="area" autocomplete="off">
         <small class="text-muted">Or area of interest.</small>
       </fieldset>
       <fieldset class="form-group">
         <label for="email">Email address</label>
-        <input type="email" class="form-control" id="email" placeholder="Enter email" autocomplete="off">
+        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" autocomplete="off">
         <small class="text-muted">We'll never share your email with anyone else.</small>
       </fieldset>
       <fieldset class="form-group">
         <label for="nickname">Nickname</label>
-        <input type="text" class="form-control" id="nickname" placeholder="Enter nickname" autocomplete="off">
+        <input type="text" class="form-control" id="nickname" placeholder="Enter nickname" name="nickname" autocomplete="off">
         <small class="text-muted">Nickname must be unique.</small>
       </fieldset>
       <fieldset class="form-group">
