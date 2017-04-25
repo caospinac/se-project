@@ -3,6 +3,7 @@ from pony import orm
 from sanic import Sanic
 from sanic.exceptions import NotFound, FileNotFound
 from sanic.response import html
+from sanic_session import InMemorySessionInterface
 
 from config import database, server
 
@@ -15,6 +16,22 @@ app.config.update(database)
 env = Environment(
     loader=PackageLoader("app", "templates"),
 )
+
+session_interface = InMemorySessionInterface()
+
+
+@app.middleware('request')
+async def add_session_to_request(request):
+    # before each request initialize a session
+    # using the client's request
+    await session_interface.open(request)
+
+
+@app.middleware('response')
+async def save_session(request, response):
+    # after each request save the session,
+    # pass the response to set client cookies
+    await session_interface.save(request, response)
 
 
 @app.exception(NotFound, FileNotFound)
@@ -45,6 +62,13 @@ async def do(request):
     return html(html_content)
 
 
+@app.route("/sign-up", methods=['GET', 'POST'])
+async def do(request):
+    view = env.get_template("sign-up.html")
+    html_content = view.render()
+    return html(html_content)
+
+
 if __name__ == '__main__':
     orm.sql_debug(app.config.SQL_DEBUG)
     try:
@@ -52,7 +76,7 @@ if __name__ == '__main__':
             app.config.DB_CLIENT,
             f"{app.config.DB_NAME}.sqlite", create_db=True
         )
-
+        '''
         engine.bind(
             'postgres',
             user=app.config.DB_USER,
@@ -60,6 +84,7 @@ if __name__ == '__main__':
             host=app.config.DB_HOST,
             database=app.config.DB_NAME
         )
+        '''
     except Exception as e:
         pass
     else:
