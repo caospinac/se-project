@@ -3,6 +3,7 @@ from collections import OrderedDict
 import jellyfish
 import re
 
+
 def parse_entry(txt):
     head_line = re.compile(r'(?P<head>[A-Z0-9]{2})\s(?P<line>.+)')
     lines = txt.split('\n')

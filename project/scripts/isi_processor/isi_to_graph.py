@@ -1,7 +1,7 @@
 import igraph as ig
-import re
 from pprint import pprint
 import isi_utils as ut
+import re
 
 
 class TreeOfScience():
@@ -28,7 +28,37 @@ class TreeOfScience():
             directed=True
         )
 
-        self.graph.vs['label'] = unique_labels
+        pattern = re.compile(
+            r"".join(
+                [
+                    "^(?P<AU>[^,]+)?, ",
+                    "(?P<PY>\d{4})?, ",
+                    "(?P<SO>[^,]+)?",
+                    "(, (?P<VL>V\d+))?",
+                    "(, (?P<PG>P\d+))?",
+                    "(, (?P<DI>DOI .+))?",
+                ]
+            )
+        )
+
+        classified_labels = [
+            pattern.match(line).groupdict()
+            if pattern.match(line) else {
+                'AU': None,
+                'DI': None,
+                'PG': None,
+                'PY': None,
+                'SO': None,
+                'VL': None,
+            }
+            for line in unique_labels
+        ]
+
+        for key in ['AU', 'DI', 'PG', 'PY', 'SO', 'VL', ]:
+            self.graph.vs[key] = [
+                article[key] for article in classified_labels
+            ]
+
         self.graph.vs['betweenness'] = self.graph.betweenness()
 
     def __preprocess_graph(self):
@@ -93,8 +123,8 @@ if __name__ == '__main__':
     tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     print('Leave:')
-    pprint([tree.graph.vs['label'][x] for x in tree.leave()])
+    pprint([tree.graph.vs['DI'][x] for x in tree.leave()])
     print('Trunk:')
-    pprint([tree.graph.vs['label'][x] for x in tree.trunk()])
+    pprint([tree.graph.vs['DI'][x] for x in tree.trunk()])
     print('Root:')
-    pprint([tree.graph.vs['label'][x] for x in tree.root()])
+    pprint([tree.graph.vs['DI'][x] for x in tree.root()])
