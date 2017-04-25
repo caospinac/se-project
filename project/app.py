@@ -1,11 +1,15 @@
 from jinja2 import Environment, PackageLoader
-from pony import orm
+from pony.orm import *
 from sanic import Sanic
 from sanic.exceptions import NotFound, FileNotFound
 from sanic.response import html
 from sanic_session import InMemorySessionInterface
 
 from config import database, server
+from models import (
+    SciNet,
+    User
+)
 
 
 app = Sanic(__name__)
@@ -64,20 +68,40 @@ async def do(request):
 
 @app.route("/sign-up", methods=['GET', 'POST'])
 async def do(request):
-    view = env.get_template("sign-up.html")
-    html_content = view.render()
+    req = request.form
+    try:
+        with db_session:
+            if User.exists(useEmail=req.get('email')):
+                return self.response_status(409)
+            uid = uuid4().hex
+            User(
+                **self.not_null_data(
+                    useId=uid,
+                    useNickName=req.get('nickname'),
+                    useArea=req.get('area'),
+                    usePassword=self.crypt(req.get('password')),
+                )
+            )
+            request['session']['user'] = us.id
+            request['session']['auth'] = us.useType
+    except Exception as e:
+        raise e
+    view = env.get_template("home.html")
+    html_content = view.render(
+        name=User[request['session'].get('user')]
+    )
     return html(html_content)
 
 
 if __name__ == '__main__':
-    orm.sql_debug(app.config.SQL_DEBUG)
+    sql_debug(app.config.SQL_DEBUG)
     try:
-        engine.bind(
+        SciNet.bind(
             app.config.DB_CLIENT,
             f"{app.config.DB_NAME}.sqlite", create_db=True
         )
         '''
-        engine.bind(
+        SciNet.bind(
             'postgres',
             user=app.config.DB_USER,
             password=app.config.DB_PASSWORD,
@@ -86,9 +110,9 @@ if __name__ == '__main__':
         )
         '''
     except Exception as e:
-        pass
+        raise e
     else:
-        engine.generate_mapping(create_tables=True)
+        SciNet.generate_mapping(create_tables=True)
 
     app.run(
         debug=app.config.DEBUG,

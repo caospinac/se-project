@@ -4,14 +4,14 @@ from .base import SciNet
 
 
 class User(SciNet.Entity):
-	_table_ = '_user'
+    _table_ = '_user'
 
-    useId = PrimaryKey(LongStr, lazy=False)
-    useType = Required(LongStr, default='res')
-    useNickName = Required(LongStr, unique=True)
-    useState = Required(LongStr, default='active')
-    useArea = Required(LongStr)
-    usePassword = Required(LongStr)
-    
+    useId = PrimaryKey(str, 32)
+    useType = Required(str, default='res')
+    useNickName = Required(str, unique=True)
+    useState = Required(str, default='active')
+    useArea = Required(str)
+    usePassword = Required(str)
+
     university = Required('University')
-	querys = Set('Query')
+    querys = Set('Query')

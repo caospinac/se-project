@@ -4,7 +4,7 @@ from .base import SciNet
 
 
 class University(SciNet.Entity):
-    uniId = PrimaryKey(LongStr, lazy=False)
-    uniName = Required(LongStr)
-    
-    users = Set(User)
+    uniId = PrimaryKey(str, 32)
+    uniName = Required(str, 64)
+
+    users = Set('User')

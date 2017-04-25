@@ -4,8 +4,8 @@ from .base import SciNet
 
 
 class Result(SciNet.Entity):
-    resId = PrimaryKey(LongStr, lazy=False)
+    resId = PrimaryKey(str, 32)
     resTime = Required(float)
-    
+
     articles = Set('Article')
-    graph = Required(Graph)
+    graph = Required('Graph')

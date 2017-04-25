@@ -4,12 +4,12 @@ from .base import SciNet
 
 
 class Article(SciNet.Entity):
-    artId = PrimaryKey(LongStr, lazy=False)
-    artDoi = Optional(LongStr)
-    artArea = Optional(LongStr)
-    artAuthor = Required(LongStr)
-    artVolume = Optional(LongStr)
-    artPage = Optional(LongStr)
-    result = Required('Result')
-    journal = Required('Journal')
-    references = Set('Reference')
+    artId = PrimaryKey(str, 32)
+    artAuthor = Required(str)
+    journal = Required(str)
+    artDoi = Optional(str)
+    artArea = Optional(str)
+    artVolume = Optional(str)
+    artPage = Optional(str)
+    result = Optional('Result')
+    references = Set('Article', reverse='references')

@@ -3,8 +3,8 @@ from .base import SciNet
 
 
 class File(SciNet.Entity):
-    filId = PrimaryKey(LongStr, lazy=False)
-    filName = Required(LongStr)
-    filContent = Required(LongStr)
+    filId = PrimaryKey(str, 32)
+    filName = Required(str, 32)
+    filContent = Required(str)
 
     query = Optional('Query')
