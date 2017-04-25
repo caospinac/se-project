@@ -1,0 +1,15 @@
+carlitos necesita una lista de articulos del resultado:
+autor
+journal
+doi
+area
+volumen
+pagina
+
+tambien necesita el str del html
+
+timpo total de procesamiento del isi al resultado
+
+dar a carlitos la ruta del csv generado de los resultados
+
+crear link a cada articulo

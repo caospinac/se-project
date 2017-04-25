@@ -60,7 +60,7 @@ class TreeOfScience():
             ]
 
         self.graph.vs["title"] = [
-            ", ".join(
+            "<br>".join(
                 [
                     x for x in vs.attributes().values() if x != None
                 ]
@@ -108,9 +108,6 @@ class TreeOfScience():
         indices = list(zip(*sorted_items))[0][offset:offset + count]
         return indices
 
-    def branch(self, offset=0, count=10):
-        raise NotImplementedError('This feature is not implemented yet')
-
     def leave(self, offset=0, count=10):
         from operator import itemgetter
 
@@ -132,6 +129,7 @@ class TreeOfScience():
             "trunk": self.trunk(),
             "root": self.root()
         }
+
         def get_indicator_by_group(vs):
             if vs["group"] == "leave":
                 return vs.outdegree()
@@ -140,29 +138,37 @@ class TreeOfScience():
             elif vs["group"] == "root":
                 return vs.indegree()
 
+        def get_color_by_group(group):
+            if group == "leave":
+                return "#4CAC33"
+            elif group == "trunk":
+                return "#F5A200"
+            elif group == "root":
+                return "#824D1E"
+
         tree_indices = [z for x in tree.values() for z in x]
         self.graph.vs["group"] = ["None"]*self.graph.vcount()
+        self.graph.vs["color"] = ["None"]*self.graph.vcount()
         for key in tree:
-            for vs_index in tree[key]:
-                self.graph.vs[vs_index]["group"] = key
+            for v_index in tree[key]:
+                self.graph.vs[v_index]["group"] = key
+                self.graph.vs[v_index]["color"] = get_color_by_group(key)
+                self.graph.vs[v_index]["label"] = self.graph.vs[v_index]["PY"]
+
         tree_graph = self.graph.subgraph(tree_indices)
+        tree_graph = tree_graph.clusters(ig.WEAK).giant()
         tree_graph.vs["id"] = tree_graph.vs.indices
-        tree_graph.vs["label"] = tree_graph.vs["group"]
         tree_graph.vs["value"] = [
             get_indicator_by_group(vs)
             for vs in tree_graph.vs
         ]
-        ig.plot(
-            tree_graph,
-            layout="fr",
-            vertex_colors="black",
-        )
+
         return tree_graph
 
 
 if __name__ == '__main__':
     tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
-    graph_tree = tree.get_tree_graph()
+    tree_graph = tree.get_tree_graph()
     print('Leave:')
     pprint([tree.graph.vs['title'][x] for x in tree.leave()])
     print('Trunk:')
@@ -175,7 +181,7 @@ if __name__ == '__main__':
 
     nodes = [
         vs.attributes()
-        for vs in graph_tree.vs
+        for vs in tree_graph.vs
     ]
 
     edges = [
@@ -184,7 +190,7 @@ if __name__ == '__main__':
             "to": es.tuple[1],
             "arrows":'to'
         }
-        for es in graph_tree.es
+        for es in tree_graph.es
     ]
 
     env = Environment(
