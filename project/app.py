@@ -11,8 +11,7 @@ from sanic_session import InMemorySessionInterface
 from config import database, SALT, server
 from models import (
     SciNet,
-    User,
-    University
+    User, University, Query
 )
 
 
@@ -198,7 +197,9 @@ async def upload(request):
 @app.route("/report", methods=['POST', 'GET'])
 async def report(request):
     template = env.get_template("report.html")
-    html_content = template.render()
+    with db_session:
+        queries = select(x for x in Query)
+    html_content = template.render(queries=queries)
     return html(html_content)
 
 

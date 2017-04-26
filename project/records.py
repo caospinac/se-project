@@ -35,5 +35,4 @@ def register_university():
 
 
 if __name__ == '__main__' and connect():
-    print()
     register_university()
