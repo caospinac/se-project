@@ -1,3 +1,8 @@
+function openInNewTab(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+
 function draw(nodes, edges) {
     var network = null;
 
@@ -37,6 +42,11 @@ function draw(nodes, edges) {
     };
     network = new vis.Network(container, data, options);
     network.on('doubleClick', function(params) {
-        document.getElementById('selection').innerHTML = 'Selection: ' + nodes[params.nodes].toSource();
+        if (nodes[params.nodes].DI != null){
+            openInNewTab("http://dx.doi.org/" + nodes[params.nodes].DI);
+        } else {
+            // window.alert("It cant by open this article, beacause this article has not a doi");
+            openInNewTab("https://www.youtube.com/watch?v=9UZbGgXvCCA");
+        }
     });
 }
