@@ -14,6 +14,8 @@
 
     <!-- siimple style -->
     <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- fonts -->
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
     
     <!-- =======================================================
@@ -54,7 +56,7 @@
                   <span class="input-group-addon glyphicon glyphicon-lock" id="password-addon"></span>
                   <input type="password" name="password" class="form-control login" placeholder="Password" aria-describedby="password-addon">
                 </div>
-                <input class="btn" type="submit" name="submit" value="Login">
+                <input class="btn btn-theme" type="submit" name="submit" value="Login">
               </form>
               </div>
             </li>
@@ -69,7 +71,7 @@
     {% block content %}
 			<div class="row">
 				<div class="col-lg-4">
-					<h1>Science network</h1>
+					<h1>Welcome to Science network</h1>
 					<h2 class="subtitle">A tool to optimize your searches</h2>
 					<form class="form-inline signup" role="form" action="/home">
 					  <button type="submit" class="btn btn-theme">Ephemeral session</button>
@@ -110,6 +112,7 @@
   {% endblock %}
   <script src="assets/js/jquery.min.js"></script>
   <script src="assets/js/jquery.easing.min.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
   <script src="assets/js/custom.js"></script>
   {% endblock %}
 </body>

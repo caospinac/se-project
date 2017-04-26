@@ -195,11 +195,17 @@ async def upload(request):
     return html(html_content)
 
 
-@app.route("/reports", methods=['POST', 'GET'])
-async def reports(request):
-    template = env.get_template("reports.html")
+@app.route("/report", methods=['POST', 'GET'])
+async def report(request):
+    template = env.get_template("report.html")
     html_content = template.render()
     return html(html_content)
+
+
+@app.route("/report1", methods=['POST', 'GET'])
+async def report1(request):
+    return json(request.args)
+
 
 if __name__ == '__main__':
     sql_debug(app.config.SQL_DEBUG)

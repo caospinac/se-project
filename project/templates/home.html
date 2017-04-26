@@ -57,25 +57,27 @@
 </div>
 <hr>
 <div class="row">
-  <div class="col-md-6 col-md-offset-3" enctype="multipart/form-data" action="/do">
-    <form class="form-control-file">
-      <fieldset class="form-group">
-        <label for="exampleInputEmail1">Topic</label>
-        <input type="text" class="form-control" id="topic" name="topic" placeholder="Enter topic" required>
-      </fieldset>
-      <fieldset class="form-group">
-        <label for="description">Description</label>
-        <textarea class="form-control" id="description" name="description" rows="3">
-        </textarea>
-      </fieldset>
-      <fieldset class="form-group">
-        <label for="file">File input</label>
-        <input type="file" class="form-control-file" id="file" name="file">
-        <small class="text-muted">This is some placeholder<maill>
-      </fieldset>
-      <button type="submit" class="btn btn-theme">Submit</button>
-    </form>
-  </div>
+    <div class="col-md-6 col-md-offset-3" enctype="multipart/form-data" action="/do">
+      <div class="form-content">
+        <form class="form-control-file">
+          <fieldset class="form-group">
+            <label for="exampleInputEmail1">Topic</label>
+            <input type="text" class="form-control" id="topic" name="topic" placeholder="Enter topic" required>
+          </fieldset>
+          <fieldset class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">
+            </textarea>
+          </fieldset>
+          <fieldset class="form-group">
+            <label for="file">File input</label>
+            <input type="file" class="form-control-file" id="file" name="file">
+            <small class="text-muted">This is some placeholder<maill>
+          </fieldset>
+          <button type="submit" class="btn btn-theme">Submit</button>
+        </form>
+      </div>
+    </div>
 </div>
 <hr>
 {% endblock %}
