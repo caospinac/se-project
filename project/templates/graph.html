@@ -1,2 +1,17 @@
 {% extends "base.html" %}
-{{ script }}
+{% block content %}
+
+{% block tag_body %}
+<body onload="toDraw();">
+{% endblock %}
+
+<script type="text/javascript">
+    function toDraw() {
+        draw({{nodes}}, {{edges}});
+    }
+</script>
+
+<div id="mynetwork"></div>
+<p id="selection"></p>
+
+{% endblock %}

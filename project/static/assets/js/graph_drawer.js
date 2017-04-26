@@ -1,6 +1,4 @@
-function draw() {
-    var nodes = {{nodes}};
-    var edges = {{edges}};
+function draw(nodes, edges) {
     var network = null;
 
     var container = document.getElementById('mynetwork');

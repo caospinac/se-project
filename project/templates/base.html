@@ -12,8 +12,9 @@
     <link href="assets/css/bootstrap.css" rel="stylesheet">
     <link href="assets/css/bootstrap-theme.css" rel="stylesheet">
 
-    <!-- siimple style -->
+    <!-- custom style -->
     <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/vis.css" rel="stylesheet">
 
     <!-- fonts -->
     <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
@@ -26,7 +27,9 @@
     ======================================================= -->
   </head>
 
+  {% block tag_body %}
   <body>
+  {% endblock %}
   {% block body %}
 
   <!-- Fixed navbar -->
@@ -114,6 +117,8 @@
   <script src="assets/js/jquery.easing.min.js"></script>
   <script src="assets/js/bootstrap.min.js"></script>
   <script src="assets/js/custom.js"></script>
+  <script src="assets/js/vis.js"></script>
+  <script src="assets/js/graph_drawer.js"></script>
   {% endblock %}
 </body>
 </html>

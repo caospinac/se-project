@@ -2,8 +2,7 @@ from pprint import pprint
 import json
 import re
 
-from jinja2 import Environment, FileSystemLoader
-import isi_utils as ut
+from .isi_utils import *
 import igraph as ig
 
 
@@ -15,19 +14,19 @@ class TreeOfScience():
         self.configure()
 
     def __build_graph(self):
-        entries = ut.get_entries(self.txt.split('\nER\n\n'))
-        labels = ut.get_label_list(entries)
+        entries = get_entries(self.txt.split('\nER\n\n'))
+        labels = get_label_list(entries)
 
-        duplicates = ut.detect_duplicate_labels(labels)
-        unique_labels = list(set(ut.patch_list(labels, duplicates)))
-        edge_relations = ut.extract_edge_relations(entries)
+        duplicates = detect_duplicate_labels(labels)
+        unique_labels = list(set(patch_list(labels, duplicates)))
+        edge_relations = extract_edge_relations(entries)
         unique_edge_relations = list(set(
-            ut.patch_tuple_list(edge_relations, duplicates)
+            patch_tuple_list(edge_relations, duplicates)
         ))
 
         identifiers = dict(zip(unique_labels, range(len(unique_labels))))
         self.graph = ig.Graph(
-            ut.patch_tuple_list(unique_edge_relations, identifiers),
+            patch_tuple_list(unique_edge_relations, identifiers),
             directed=True
         )
 
@@ -170,7 +169,7 @@ class TreeOfScience():
 
         return tree_graph
 
-    def get_html_graph(self):
+    def get_graph(self):
         tree_graph = self.get_tree_graph()
         nodes = [
             vs.attributes()
@@ -185,19 +184,7 @@ class TreeOfScience():
             }
             for es in tree_graph.es
         ]
-
-        env = Environment(
-            loader=FileSystemLoader(""),
-        )
-
-        html_content = env.get_template(
-            "../../templates/graph_template.html"
-        ).render(
-            nodes=json.dumps(nodes),
-            edges=json.dumps(edges)
-        )
-
-        return html_content
+        return json.dumps(nodes), json.dumps(edges)
 
 
 if __name__ == '__main__':

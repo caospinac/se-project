@@ -14,6 +14,7 @@ from models import (
     SciNet,
     Graph, Query, University, User, File
 )
+from scripts.isi_processor import TreeOfScience as ToS
 
 
 app = Sanic(__name__)
@@ -162,6 +163,14 @@ async def graph(request, graId):
 @app.route("/query", methods=['POST', 'GET'])
 async def query(request):
     req_file = request.files.get('file')
+    if req_file:
+        body = req_file.body.decode("unicode_escape")
+        tos = ToS(body)
+        nodes, edges = tos.get_graph()
+        view = env.get_template("graph.html")
+        html_content = view.render(nodes=nodes, edges=edges)
+        return html(html_content)
+    '''
     user = request['session'].get('user')
     if not user:
         return json("No login")
@@ -171,7 +180,7 @@ async def query(request):
             file = File(
                 filId=uuid4().hex,
                 filName=req_file.name,
-                filContent="content",
+                filContent=req_file.body,
             )
             query = Query(
                 queId=uuid4().hex,
@@ -190,6 +199,7 @@ async def query(request):
     return redirect(
         app.url_for("graph", graId=graph.graId)
     )
+    '''
 
 
 @app.route("/report", methods=['POST', 'GET'])
