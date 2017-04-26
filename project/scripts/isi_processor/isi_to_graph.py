@@ -207,6 +207,9 @@ if __name__ == '__main__':
             'r'
         ).read()
     )
+
+    tree.get_html_graph()
+
     with open("resulting_graph.html", "w+") as fh:
         fh.write(tree.get_html_graph())
     print('Leave:')
