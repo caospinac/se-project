@@ -152,7 +152,7 @@ async def sign_out(request):
     return redirect(url)
 
 
-@app.route("/query/graph/<graId:\w{32}>", methods=['GET', 'POST'])
+@app.route("/query/graphs/<graId:\w{32}>", methods=['GET', 'POST'])
 async def graph(request, graId):
     script = graId
     view = env.get_template("graph.html")
@@ -163,18 +163,17 @@ async def graph(request, graId):
 @app.route("/query", methods=['POST', 'GET'])
 async def query(request):
     req_file = request.files.get('file')
-    if req_file:
-        body = req_file.body.decode("unicode_escape")
-        tos = ToS(body)
-        nodes, edges = tos.get_graph()
-        view = env.get_template("graph.html")
-        html_content = view.render(nodes=nodes, edges=edges)
-        return html(html_content)
-    '''
+    if not req_file:
+        return redirect(app.url_for("query"))
+    body = req_file.body.decode("unicode_escape")
+    tos = ToS(body)
+    nodes, edges = tos.get_graph()
+    data = {"nodes": nodes, "edges": edges}
     user = request['session'].get('user')
     if not user:
-        return json("No login")
-    req = request.form
+        view = env.get_template("graph.html")
+        html_content = view.render(nodes=data['nodes'], edges=data['edges'])
+        return html(html_content)
     try:
         with db_session:
             file = File(
@@ -191,7 +190,7 @@ async def query(request):
             )
             graph = Graph(
                 graId=uuid4().hex,
-                graContent="content",
+                graContent=json.dumps(data),
                 query=Query[query.queId]
             )
     except Exception as e:
