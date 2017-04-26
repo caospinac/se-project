@@ -36,9 +36,9 @@ class TreeOfScience():
                     "^(?P<AU>[^,]+)?, ",
                     "(?P<PY>\d{4})?, ",
                     "(?P<SO>[^,]+)?",
-                    "(, (?P<VL>V\d+))?",
-                    "(, (?P<PG>P\d+))?",
-                    "(, (?P<DI>DOI .+))?",
+                    "(, V(?P<VL>\d+))?",
+                    "(, P(?P<PG>\d+))?",
+                    "(, DOI (?P<DI>.+))?",
                 ]
             )
         )
@@ -61,12 +61,22 @@ class TreeOfScience():
                 article[key] for article in classified_labels
             ]
 
+        article_keys = {
+                'AU': 'Author',
+                'DI': 'Doi',
+                'PG': 'Page',
+                'PY': 'Published year',
+                'SO': 'Journal',
+                'VL': 'Volume'
+        }
+
         self.graph.vs["title"] = [
             "<br>".join(
                 [
-                    x
-                    for x in vs.attributes().values()
-                    if x is not None
+                    "{}: {}".format(
+                        article_keys[x], vs[x] if vs[x] is not None else "N/A"
+                    )
+                    for x in article_keys.keys()
                 ]
             )
             for vs in self.graph.vs
