@@ -211,3 +211,16 @@ p.copyright {
 .credits a{
     color: #fff;
 }
+
+#mynetwork {
+    float:left;
+    width: 80%;
+    height: 80vh;
+    border: 1px solid lightgray;
+    background-color: #222222;
+}
+#config {
+    float:left;
+    width: 400px;
+    height: 600px;
+}
