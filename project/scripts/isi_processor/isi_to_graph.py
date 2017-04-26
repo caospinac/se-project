@@ -1,18 +1,21 @@
-import igraph as ig
 from pprint import pprint
-import isi_utils as ut
+import json
 import re
+
+from jinja2 import Environment, FileSystemLoader
+import isi_utils as ut
+import igraph as ig
 
 
 class TreeOfScience():
 
-    def __init__(self, path):
+    def __init__(self, txt):
         self.graph = ig.Graph()
-        self.path = path
+        self.txt = txt
         self.configure()
 
     def __build_graph(self):
-        entries = ut.get_entries(open(self.path, 'r').read().split('\nER\n\n'))
+        entries = ut.get_entries(self.txt.split('\nER\n\n'))
         labels = ut.get_label_list(entries)
 
         duplicates = ut.detect_duplicate_labels(labels)
@@ -62,7 +65,9 @@ class TreeOfScience():
         self.graph.vs["title"] = [
             "<br>".join(
                 [
-                    x for x in vs.attributes().values() if x != None
+                    x
+                    for x in vs.attributes().values()
+                    if x is not None
                 ]
             )
             for vs in self.graph.vs
@@ -147,8 +152,8 @@ class TreeOfScience():
                 return "#824D1E"
 
         tree_indices = [z for x in tree.values() for z in x]
-        self.graph.vs["group"] = ["None"]*self.graph.vcount()
-        self.graph.vs["color"] = ["None"]*self.graph.vcount()
+        self.graph.vs["group"] = ["None"] * self.graph.vcount()
+        self.graph.vs["color"] = ["None"] * self.graph.vcount()
         for key in tree:
             for v_index in tree[key]:
                 self.graph.vs[v_index]["group"] = key
@@ -165,42 +170,46 @@ class TreeOfScience():
 
         return tree_graph
 
+    def get_html_graph(self):
+        tree_graph = self.get_tree_graph()
+        nodes = [
+            vs.attributes()
+            for vs in tree_graph.vs
+        ]
+
+        edges = [
+            {
+                "from": es.tuple[0],
+                "to": es.tuple[1],
+                "arrows":'to'
+            }
+            for es in tree_graph.es
+        ]
+
+        env = Environment(
+            loader=FileSystemLoader(""),
+        )
+
+        html_content = env.get_template("graph_template.html").render(
+            nodes=json.dumps(nodes),
+            edges=json.dumps(edges)
+        )
+
+        return html_content
+
 
 if __name__ == '__main__':
-    tree = TreeOfScience('Entrepreneurial Marketing 120ART 22-OCT-16.txt')
-    tree_graph = tree.get_tree_graph()
+    tree = TreeOfScience(
+        open(
+            'Entrepreneurial Marketing 120ART 22-OCT-16.txt',
+            'r'
+        ).read()
+    )
+    with open("resulting_graph.html", "w+") as fh:
+        fh.write(tree.get_html_graph())
     print('Leave:')
     pprint([tree.graph.vs['title'][x] for x in tree.leave()])
     print('Trunk:')
     pprint([tree.graph.vs['title'][x] for x in tree.trunk()])
     print('Root:')
     pprint([tree.graph.vs['title'][x] for x in tree.root()])
-
-    from jinja2 import Environment, FileSystemLoader
-    import json
-
-    nodes = [
-        vs.attributes()
-        for vs in tree_graph.vs
-    ]
-
-    edges = [
-        {
-            "from": es.tuple[0],
-            "to": es.tuple[1],
-            "arrows":'to'
-        }
-        for es in tree_graph.es
-    ]
-
-    env = Environment(
-        loader=FileSystemLoader(""),
-    )
-
-    html_content = env.get_template("graph_plot.html").render(
-        nodes=json.dumps(nodes),
-        edges=json.dumps(edges)
-    )
-
-    with open("my_new_file.html", "w+") as fh:
-        fh.write(html_content)

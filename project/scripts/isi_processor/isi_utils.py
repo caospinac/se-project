@@ -1,7 +1,7 @@
 from collections import OrderedDict
+import re
 
 import jellyfish
-import re
 
 
 def parse_entry(txt):
