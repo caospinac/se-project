@@ -190,7 +190,9 @@ class TreeOfScience():
             loader=FileSystemLoader(""),
         )
 
-        html_content = env.get_template("graph_template.html").render(
+        html_content = env.get_template(
+            "../../templates/graph_template.html"
+        ).render(
             nodes=json.dumps(nodes),
             edges=json.dumps(edges)
         )
