@@ -32,7 +32,10 @@
           </fieldset>
           <fieldset class="col-md-2 form-group text-center">
             <div class="row">
-              <button type="submit" class="btn btn-theme">Generate report</button>
+              <button type="submit" class="btn">Filter results</button>
+            </div>
+            <div class="row">
+              <a href="#" class="btn btn-theme">Download report</a>
             </div>
           </fieldset>
         </form>
@@ -42,13 +45,19 @@
 
 {% if queries %}
 <div class="list-group">
+  <div class="row list-group-item list-group-item-action">
+      <div class="col-md-3">Date</div>
+      <div class="col-md-3">Topic</div>
+      <div class="col-md-3">Description</div>
+      <div class="col-md-3">Email user</div>
+  </div>
   {% for query in queries %}
-  <div class="row">
-    <a href="/report/{{ query.id }}" class="list-group-item list-group-item-action">
-      <div class="col-md-auto">{{ query.useId }}</div>
-      <div class="col-md-auto">{{ query.queDate }}</div>
-      <div class="col-md-auto">{{ query.queTopic }}</div>
-      <div class="col-md-auto">{{ query.user.usuEmail }}</div>
+  <div class="row list-group-item list-group-item-action">
+    <a href="/report/{{ query[0] }}" target="_blank">
+      <div class="col-md-3">{{ query[0] }}</div>
+      <div class="col-md-3">{{ query[1] }}</div>
+      <div class="col-md-3">{{ query[2] }}</div>
+      <div class="col-md-3">{{ query[3] }}</div>
     </a>
   </div>
   {% endfor %}

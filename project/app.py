@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 
 from jinja2 import Environment, PackageLoader
@@ -11,7 +12,7 @@ from sanic_session import InMemorySessionInterface
 from config import database, SALT, server
 from models import (
     SciNet,
-    User, University, Query
+    Graph, Query, University, User, File
 )
 
 
@@ -150,61 +151,63 @@ async def sign_out(request):
     return redirect(url)
 
 
-@app.route("/graph/<graId:\w{32}>", methods=['GET', 'POST'])
-async def graph(request):
-    user = request['session'].get('user')
-    if not user:
-        return self.response_status(401)
-    with db_session:
-        if id == 'all':
-            return self.response_status(
-                200, select(
-                    (l.id, l.name, l.state, l.city, l.address)
-                    for l in Land
-                    if l.user == User[user] and l.active
-                )
-            )
-        if not Land.exists(id=id):
-            return self.response_status(404)
-        return self.response_status(
-            200, select(
-                (l.name, l.state, l.city, l.address)
-                for l in Land if l.id == id and l.active
-            )
-        )
-    script = graph_script(request.file.body)
+@app.route("/query/graph/<graId:\w{32}>", methods=['GET', 'POST'])
+async def graph(request, graId):
+    script = graId
     view = env.get_template("graph.html")
     html_content = view.render(script=script)
     return html(html_content)
 
 
-@app.route("/upload", methods=['POST', 'GET'])
-async def upload(request):
-    file = request.files.get('selectedFile')
+@app.route("/query", methods=['POST', 'GET'])
+async def query(request):
+    req_file = request.files.get('file')
+    user = request['session'].get('user')
+    if not user:
+        return json("No login")
+    req = request.form
     try:
-        script = util.build_graph(file.body)
-        content = [(row[0], row[1:]) for row in content0]
+        with db_session:
+            file = File(
+                filId=uuid4().hex,
+                filName=req_file.name,
+                filContent="content",
+            )
+            query = Query(
+                queId=uuid4().hex,
+                queTopic=req.get('topic'),
+                queDescription=req.get('description'),
+                user=User[user],
+                file=file,
+            )
+            graph = Graph(
+                graId=uuid4().hex,
+                graContent="content",
+                query=Query[query.queId]
+            )
     except Exception as e:
         raise e
-        content = []
-
-    template = env.get_template("input.html")
-    html_content = template.render(
-        uploaded=content, measure_labels=ms.labels)
-    return html(html_content)
+    return redirect(
+        app.url_for("graph", graId=graph.graId)
+    )
 
 
 @app.route("/report", methods=['POST', 'GET'])
 async def report(request):
-    template = env.get_template("report.html")
-    with db_session:
-        queries = select(x for x in Query)
-    html_content = template.render(queries=queries)
-    return html(html_content)
+    try:
+        with db_session:
+            queries = select(
+                (x.queDate, x.queTopic, x.queDescription, x.user.useEmail)
+                for x in Query
+            )
+            template = env.get_template("report.html")
+            html_content = template.render(queries=queries)
+            return html(html_content)
+    except Exception as e:
+        raise e
 
 
-@app.route("/report1", methods=['POST', 'GET'])
-async def report1(request):
+async def report_user(request):
     return json(request.args)
 
 

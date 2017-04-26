@@ -34,5 +34,14 @@ def register_university():
         University(uniName=x, uniId=uuid4().hex)
 
 
+@db_session
+def register_admin():
+    admins = [
+        {'useName', 'useEmail', 'useArea',}
+    ]
+    for x in universities:
+        University(uniName=x, uniId=uuid4().hex)
+
+
 if __name__ == '__main__' and connect():
     register_university()
