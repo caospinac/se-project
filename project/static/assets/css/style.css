@@ -115,6 +115,9 @@ a.navbar-brand:hover {
 #header {	
 	background-color: #444;
 	background: url(../img/main-bg.jpg) no-repeat center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center; 
 	margin-top: -20px;
 	padding-top: 150px;
 	background-attachment: relative;
@@ -147,7 +150,7 @@ a.navbar-brand:hover {
   font-size: 45px;
 }
 
-h2.subtitle {
+h2.subtitle, label {
 	color: #fff;
 	font-size: 20px;
 }
