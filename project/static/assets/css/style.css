@@ -13,6 +13,11 @@ body {
   color: #fff;
 }
 
+label.error {
+  color: #d7d745;
+  font-size: small;
+}
+
 a.list-group {
   color: #444;
 }
