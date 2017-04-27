@@ -209,6 +209,12 @@ async def query(request):
                 resTime=time() - time_start,
                 graph=graph,
             )
+            graph = pyjson.loads(graph.graContent)
+            view = env.get_template("graph.html")
+            html_content = view.render(
+                nodes=graph['nodes'], edges=graph['edges'], name=request["session"].get("name")
+            )
+            return html(html_content)
     except Exception as e:
         raise e
     return redirect(
