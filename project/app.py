@@ -82,13 +82,6 @@ async def home(request):
     return html(html_content)
 
 
-@app.route("/do", methods=['GET', 'POST'])
-async def do(request):
-    view = env.get_template("network.html")
-    html_content = view.render()
-    return html(html_content)
-
-
 @app.route("/sign-in", methods=['POST'])
 async def sign_in(request):
     req = request.form
@@ -225,16 +218,52 @@ async def query(request):
 
 @app.route("/report", methods=['POST', 'GET'])
 async def report(request):
+    req = request.args
+    email = req['email'][0] if 'email' in req else None
+    date0 = req['date'][0] if 'date' in req else None
+    date1 = req['date'][1] if 'date' in req else None
     try:
         with db_session:
-            queries = select(
-                (
-                    x.queId, x.queDate,
-                    x.user.useName, x.user.useLastName, x.user.useEmail,
-                    x.queTopic, x.queDescription
+            if email and date0 and date1:
+                queries = select(
+                    (
+                        x.queId, x.queDate,
+                        x.user.useName, x.user.useLastName, x.user.useEmail,
+                        x.queTopic, x.queDescription
+                    )
+                    for x in Query
+                    if x.user.useEmail == email and date0 <= x.queDate <= date1
                 )
-                for x in Query
-            )
+            elif email:
+                queries = select(
+                    (
+                        x.queId, x.queDate,
+                        x.user.useName, x.user.useLastName, x.user.useEmail,
+                        x.queTopic, x.queDescription
+                    )
+                    for x in Query
+                    if x.user.useEmail == email
+                )
+
+            elif date0 and date1:
+                queries = select(
+                    (
+                        x.queId, x.queDate,
+                        x.user.useName, x.user.useLastName, x.user.useEmail,
+                        x.queTopic, x.queDescription
+                    )
+                    for x in Query
+                    if date0 <= x.queDate <= date1
+                )
+            else:
+                queries = select(
+                    (
+                        x.queId, x.queDate,
+                        x.user.useName, x.user.useLastName, x.user.useEmail,
+                        x.queTopic, x.queDescription
+                    )
+                    for x in Query
+                )
             template = env.get_template("report.html")
             html_content = template.render(queries=queries)
             return html(html_content)
