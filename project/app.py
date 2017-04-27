@@ -2,6 +2,7 @@ from datetime import datetime
 import json as pyjson
 from time import time
 from uuid import uuid4
+from pprint import pprint
 
 from jinja2 import Environment, PackageLoader
 from passlib.hash import pbkdf2_sha256
@@ -148,17 +149,22 @@ async def sign_out(request):
     url = app.url_for('index')
     return redirect(url)
 
+def get_html_with_graph(nodes, edges):
+    view = env.get_template("graph.html")
+    nodes = pyjson.loads(nodes)
+    edges = pyjson.loads(edges)
+    html_content = view.render(
+        nodes=pyjson.dumps(nodes), edges=pyjson.dumps(edges)
+    )
+    return html(html_content)
+
 
 @app.route("/query/graphs/<graId:\w{32}>", methods=['GET', 'POST'])
 async def graph(request, graId):
     try:
         with db_session:
             graph = pyjson.loads(Graph[graId].graContent)
-            view = env.get_template("graph.html")
-            html_content = view.render(
-                nodes=graph['nodes'], edges=graph['edges']
-            )
-            return html(html_content)
+            return get_html_with_graph(graph["nodes"], graph["edges"])
     except Exception as e:
         raise e
         view = env.get_template("404.html")
@@ -178,11 +184,10 @@ async def query(request):
     data = {"nodes": nodes, "edges": edges}
     user = request['session'].get('user')
     if not user:
-        view = env.get_template("graph.html")
-        html_content = view.render(
-            nodes=data['nodes'], edges=data['edges'], time=time() - time_start
+        return get_html_with_graph(
+            data['nodes'],
+            data['edges']
         )
-        return html(html_content)
     try:
         # articles = []
         req = request.form
@@ -209,17 +214,11 @@ async def query(request):
                 resTime=time() - time_start,
                 graph=graph,
             )
-            graph = pyjson.loads(graph.graContent)
-            view = env.get_template("graph.html")
-            html_content = view.render(
-                nodes=graph['nodes'], edges=graph['edges'], name=request["session"].get("name")
+            return redirect(
+                app.url_for("graph", graId=graph.graId)
             )
-            return html(html_content)
     except Exception as e:
         raise e
-    return redirect(
-        app.url_for("graph", graId=graph.graId)
-    )
 
 
 @app.route("/report", methods=['POST', 'GET'])
