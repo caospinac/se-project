@@ -7,11 +7,12 @@ class User(SciNet.Entity):
     _table_ = '_user'
 
     useId = PrimaryKey(str, 32)
-    useType = Required(str, default='res')
-    useNickName = Required(str, unique=True)
-    useState = Required(str, default='active')
-    useArea = Required(str)
-    useEmail = Required(str)
+    useType = Required(str, 3, default='res')
+    useName = Required(str, 40)
+    useLastName = Required(str, 40)
+    useState = Required(str, 10, default='active')
+    useArea = Required(str, 32, default='Not specified')
+    useEmail = Required(str, 64)
     usePassword = Required(str)
 
     university = Required('University')

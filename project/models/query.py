@@ -8,8 +8,8 @@ from .base import SciNet
 class Query(SciNet.Entity):
     queId = PrimaryKey(str, 32)
     queDate = Required(datetime, sql_default='CURRENT_TIMESTAMP')
-    queTopic = Required(str)
-    queDescription = Optional(str)
+    queTopic = Required(str, 64)
+    queDescription = Optional(str, 256)
 
     user = Required('User')
     file = Required('File')

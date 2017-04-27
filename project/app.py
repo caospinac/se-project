@@ -1,4 +1,6 @@
 from datetime import datetime
+import json as pyjson
+from time import time
 from uuid import uuid4
 
 from jinja2 import Environment, PackageLoader
@@ -12,7 +14,7 @@ from sanic_session import InMemorySessionInterface
 from config import database, SALT, server
 from models import (
     SciNet,
-    Graph, Query, University, User, File
+    Graph, Query, University, User, File, Result, Article
 )
 from scripts.isi_processor import TreeOfScience as ToS
 
@@ -75,7 +77,7 @@ async def index(request):
 @app.route("/home", methods=['GET', 'POST'])
 async def home(request):
     view = env.get_template("home.html")
-    name = request['session'].get('nickname')
+    name = request['session'].get('name')
     html_content = view.render(name=name) if name else view.render()
     return html(html_content)
 
@@ -98,12 +100,13 @@ async def sign_in(request):
             us = User.select(lambda u: u.useEmail == email).first()
             login = pbkdf2_sha256.verify(f"{password}{SALT}", us.usePassword)
     except Exception as e:
+        raise e
         login = False
     if not login or not us:
         url = app.url_for('index')
     else:
         request['session']['user'] = us.useId
-        request['session']['nickname'] = us.useNickName
+        request['session']['name'] = us.useName
         request['session']['auth'] = us.useType
         url = app.url_for('home')
     return redirect(url)
@@ -119,7 +122,8 @@ async def sign_up(request):
                 us = User(
                     **not_null_data(
                         useId=uid,
-                        useNickName=req.get('nickname'),
+                        useName=req.get('name'),
+                        useLastName=req.get('lastname'),
                         useArea=req.get('area'),
                         useEmail=req.get('email'),
                         usePassword=crypt(req.get('password')),
@@ -127,7 +131,7 @@ async def sign_up(request):
                     )
                 )
                 request['session']['user'] = us.useId
-                request['session']['nickname'] = us.useNickName
+                request['session']['name'] = us.useName
                 request['session']['auth'] = us.useType
             url = app.url_for('home')
             return redirect(url)
@@ -144,7 +148,7 @@ async def sign_up(request):
 async def sign_out(request):
     try:
         del request['session']['user']
-        del request['session']['nickname']
+        del request['session']['name']
         del request['session']['auth']
     except KeyError as e:
         pass
@@ -154,10 +158,19 @@ async def sign_out(request):
 
 @app.route("/query/graphs/<graId:\w{32}>", methods=['GET', 'POST'])
 async def graph(request, graId):
-    script = graId
-    view = env.get_template("graph.html")
-    html_content = view.render(script=script)
-    return html(html_content)
+    try:
+        with db_session:
+            graph = pyjson.loads(Graph[graId].graContent)
+            view = env.get_template("graph.html")
+            html_content = view.render(
+                nodes=graph['nodes'], edges=graph['edges']
+            )
+            return html(html_content)
+    except Exception as e:
+        raise e
+        view = env.get_template("404.html")
+        html_content = view.render()
+        return html(html_content)
 
 
 @app.route("/query", methods=['POST', 'GET'])
@@ -165,6 +178,7 @@ async def query(request):
     req_file = request.files.get('file')
     if not req_file:
         return redirect(app.url_for("query"))
+    time_start = time()
     body = req_file.body.decode("unicode_escape")
     tos = ToS(body)
     nodes, edges = tos.get_graph()
@@ -172,14 +186,18 @@ async def query(request):
     user = request['session'].get('user')
     if not user:
         view = env.get_template("graph.html")
-        html_content = view.render(nodes=data['nodes'], edges=data['edges'])
+        html_content = view.render(
+            nodes=data['nodes'], edges=data['edges'], time=time() - time_start
+        )
         return html(html_content)
     try:
+        # articles = []
+        req = request.form
         with db_session:
             file = File(
                 filId=uuid4().hex,
                 filName=req_file.name,
-                filContent=req_file.body,
+                filContent=body,
             )
             query = Query(
                 queId=uuid4().hex,
@@ -190,15 +208,19 @@ async def query(request):
             )
             graph = Graph(
                 graId=uuid4().hex,
-                graContent=json.dumps(data),
+                graContent=pyjson.dumps(data),
                 query=Query[query.queId]
+            )
+            result = Result(
+                resId=uuid4().hex,
+                resTime=time() - time_start,
+                graph=graph,
             )
     except Exception as e:
         raise e
     return redirect(
         app.url_for("graph", graId=graph.graId)
     )
-    '''
 
 
 @app.route("/report", methods=['POST', 'GET'])
@@ -206,7 +228,11 @@ async def report(request):
     try:
         with db_session:
             queries = select(
-                (x.queDate, x.queTopic, x.queDescription, x.user.useEmail)
+                (
+                    x.queId, x.queDate,
+                    x.user.useName, x.user.useLastName, x.user.useEmail,
+                    x.queTopic, x.queDescription
+                )
                 for x in Query
             )
             template = env.get_template("report.html")

@@ -3,7 +3,7 @@
 {% block title %}Start{% endblock %}
 
 {% block user_control %}
-<li><a href=""><span class="glyphicon glyphicon-user"></span> {{ name if name is defined else "Anonymous"}}</a></li>
+<li><a href="/home"><span class="glyphicon glyphicon-user"></span> {{ name if name is defined else "Anonymous"}}</a></li>
 {% if role == "adm" %}
 <li><a href="/reports"><span class="glyphicon glyphicon-list"></span> Report</a></li>
 {% endif %}

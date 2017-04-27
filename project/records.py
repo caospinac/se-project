@@ -1,8 +1,9 @@
+import sys
 from uuid import uuid4
 
 from pony.orm import db_session
 
-from models import University, SciNet
+from models import University, SciNet, User
 from config import database as db
 
 
@@ -35,13 +36,18 @@ def register_university():
 
 
 @db_session
-def register_admin():
-    admins = [
-        {'useName', 'useEmail', 'useArea',}
-    ]
-    for x in universities:
-        University(uniName=x, uniId=uuid4().hex)
+def auth_as_admin(*emails):
+    with db_session:
+        for email in emails:
+            user = User.get(useEmail=email)
+            if user:
+                user.set(useType='adm')
 
 
 if __name__ == '__main__' and connect():
     register_university()
+    auth_as_admin(
+        "caaospinaca@unal.edu.co",
+        "dsvalenciah@unal.cdu.co",
+        "msochel@unal.cdu.co",
+    )
