@@ -25,6 +25,9 @@ $(function() {
             window.location.hash = hash;
         });
     });
+    $.validator.addMethod("regx", function(value, element, regexpr) {          
+      return regexpr.test(value);
+    }, "Please enter a valid name.");
 
     $.validator.setDefaults({
       debug: false,
@@ -38,11 +41,12 @@ $(function() {
         "name": {
           required: true,
           maxlength: 40,
-          type: text;
+          regx: /[a-zA-Z ]/,
         },
         "lastname": {
           required: true,
           maxlength: 40,
+          regx: /[a-zA-Z ]/,
         },
         "email": {
           required: true,
