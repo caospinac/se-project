@@ -16,6 +16,7 @@ from models import (
     SciNet,
     Graph, Query, University, User, File, Result, Article
 )
+import records
 from scripts.isi_processor import TreeOfScience as ToS
 
 
@@ -125,6 +126,8 @@ async def sign_up(request):
                         university=University[req.get('university')]
                     )
                 )
+                if us.useEmail in ["caaospinaca@unal.edu.co", "msochel@unal.edu.co", "dsvalenciah@unal.edu.co"]:
+                    records.admin(us.useEmail)
                 request['session']['user'] = us.useId
                 request['session']['name'] = us.useName
                 request['session']['auth'] = us.useType

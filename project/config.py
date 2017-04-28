@@ -2,7 +2,7 @@ import urllib.parse as urlparse
 import os
 
 
-PRODUCTION = False
+PRODUCTION = True
 
 if PRODUCTION:
     url = urlparse.urlparse(os.environ['DATABASE_URL'])
