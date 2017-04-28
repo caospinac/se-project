@@ -1,5 +1,6 @@
 from datetime import datetime
 import json as pyjson
+import pandas as pd
 from time import time
 from uuid import uuid4
 
@@ -228,6 +229,7 @@ async def report(request):
     email = req['email'][0] if 'email' in req else None
     date0 = req['date'][0] if 'date' in req else None
     date1 = req['date'][1] if 'date' in req else None
+    list_report = list()
     try:
         with db_session:
             if email and date0 and date1:
@@ -270,6 +272,19 @@ async def report(request):
                     )
                     for x in Query
                 )
+            for x in queries:
+                list_report.append(x[1:])
+            df = pd.DataFrame(
+                    list_report,
+                    columns=[
+                        "Date",
+                        "Name",
+                        "Lastname",
+                        "Email",
+                        "Topic",
+                        "Description"]
+                )
+            df.to_csv("project/static/report.csv", sep='\t', encoding='utf-8')
             template = env.get_template("report.html")
             html_content = template.render(queries=queries)
             return html(html_content)

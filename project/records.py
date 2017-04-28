@@ -48,6 +48,6 @@ if __name__ == '__main__' and connect():
     register_university()
     auth_as_admin(
         "caaospinaca@unal.edu.co",
-        "dsvalenciah@unal.cdu.co",
-        "msochel@unal.cdu.co",
+        "dsvalenciah@unal.edu.co",
+        "msochel@unal.edu.co",
     )
