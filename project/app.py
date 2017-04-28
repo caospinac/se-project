@@ -149,6 +149,7 @@ async def sign_out(request):
     url = app.url_for('index')
     return redirect(url)
 
+
 def get_html_with_graph(nodes, edges):
     view = env.get_template("graph.html")
     nodes = pyjson.loads(nodes)
@@ -157,19 +158,6 @@ def get_html_with_graph(nodes, edges):
         nodes=pyjson.dumps(nodes), edges=pyjson.dumps(edges)
     )
     return html(html_content)
-
-
-@app.route("/query/graphs/<graId:\w{32}>", methods=['GET', 'POST'])
-async def graph(request, graId):
-    try:
-        with db_session:
-            graph = pyjson.loads(Graph[graId].graContent)
-            return get_html_with_graph(graph["nodes"], graph["edges"])
-    except Exception as e:
-        raise e
-        view = env.get_template("404.html")
-        html_content = view.render()
-        return html(html_content)
 
 
 @app.route("/query", methods=['POST', 'GET'])
@@ -214,9 +202,10 @@ async def query(request):
                 resTime=time() - time_start,
                 graph=graph,
             )
-            return redirect(
-                app.url_for("graph", graId=graph.graId)
-            )
+        return get_html_with_graph(
+            data['nodes'],
+            data['edges']
+        )
     except Exception as e:
         raise e
 
