@@ -22,7 +22,7 @@ def connect():
 
 
 @db_session
-def register_university():
+def universities():
     universities = [
         'Universidad Nacional de Colombia',
         'Universidad de Caldas',
@@ -32,22 +32,29 @@ def register_university():
         'Other'
     ]
     for x in universities:
+        if University.exists(uniName=x):
+            continue
         University(uniName=x, uniId=uuid4().hex)
 
 
 @db_session
-def auth_as_admin(*emails):
+def admin(*emails):
     with db_session:
         for email in emails:
             user = User.get(useEmail=email)
-            if user:
-                user.set(useType='adm')
+            if not user:
+                continue
+            user.set(useType='adm')
 
 
 if __name__ == '__main__' and connect():
+<<<<<<< HEAD
+    globals()[sys.argv[1]](*sys.argv[2:])
+=======
     register_university()
     auth_as_admin(
         "caaospinaca@unal.edu.co",
-        "dsvalenciah@unal.cdu.co",
-        "msochel@unal.cdu.co",
+        "dsvalenciah@unal.edu.co",
+        "msochel@unal.edu.co",
     )
+>>>>>>> report

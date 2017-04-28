@@ -1,16 +1,20 @@
 body {
   background-color: #f2f2f2;
-    font-family: 'Lato', sans-serif;
-    font-size: 16px;
-    line-height: 1.6em;
-    -webkit-font-smoothing: antialiased;
-    -webkit-overflow-scrolling: touch;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  line-height: 1.6em;
+  -webkit-font-smoothing: antialiased;
+  -webkit-overflow-scrolling: touch;
 }
 
 .form-content {
   background-color: rgba(0, 0, 0, 0.37);
   padding: 25px;
   color: #fff;
+}
+
+span {
+  cursor: default;
 }
 
 label.error {
@@ -28,9 +32,9 @@ input[type=date] {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Lato', sans-serif;
-    font-weight: 300;
-    color: #444;
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  color: #444;
 }
 
 h1 {
@@ -47,39 +51,39 @@ h4 {
 }
 
 p {
-    margin-bottom: 20px;
-    font-size: 16px;
+  margin-bottom: 20px;
+  font-size: 16px;
 }
 
 
 a:hover,
 a:focus {
-    color: #b7cb1b;
-    text-decoration: none;
-    outline: 0;
+  color: #b7cb1b;
+  text-decoration: none;
+  outline: 0;
 }
 
 a:before,
 a:after {
-    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
-    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
-    transition: color 0.1s ease-in, background 0.1s ease-in;
+  -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+  transition: color 0.1s ease-in, background 0.1s ease-in;
 }
 .navbar-inverse .navbar-nav > li > a {
-    color: #fff;
+  color: #fff;
 }
 
 .alignleft {
-    text-align: left;
+  text-align: left;
 }
 .alignright {
-    text-align: right;
+  text-align: right;
 }
 
 .aligncenter {
-    text-align: center;
+  text-align: center;
 }
 
 .btn-theme  {
@@ -112,7 +116,7 @@ a.navbar-brand {
 	text-transform: uppercase;
 }
 a.navbar-brand:hover {
-    color: #ddd !important;
+  color: #ddd !important;
 }
 
 /* Header */
@@ -130,15 +134,15 @@ a.navbar-brand:hover {
 	min-height: 650px;
 	width: 100%;
 	
-    -webkit-background-size: 100%;
-    -moz-background-size: 100%;
-    -o-background-size: 100%;
-    background-size: 100%;
+  -webkit-background-size: 100%;
+  -moz-background-size: 100%;
+  -o-background-size: 100%;
+  background-size: 100%;
 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 
@@ -202,23 +206,21 @@ p.copyright {
 }	
 
 .credits {
-    text-align: right;
-    color: #fff;
+  text-align: right;
+  color: #fff;
 }
 
 .credits a{
-    color: #fff;
+  color: #fff;
 }
 
 #mynetwork {
-    float:left;
-    width: 80%;
-    height: 80vh;
-    border: 1px solid lightgray;
-    background-color: #222222;
+  width: 100%;
+  height: 80vh;
+  border: 1px solid lightgray;
+  background-color: #222222;
 }
 #config {
-    float:left;
-    width: 400px;
-    height: 600px;
+  width: 400px;
+  height: 600px;
 }
