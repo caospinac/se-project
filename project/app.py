@@ -1,5 +1,6 @@
 from datetime import datetime
 import json as pyjson
+import pandas as pd
 from time import time
 from uuid import uuid4
 
@@ -241,6 +242,7 @@ async def report(request):
         if 'min_date' in req else None
     date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
         if 'max_date' in req else None
+    list_report = list()
     try:
         with db_session:
             if email and date0 and date1:
@@ -284,6 +286,19 @@ async def report(request):
                     )
                     for x in Query
                 )
+            for x in queries:
+                list_report.append(x[1:])
+            df = pd.DataFrame(
+                    list_report,
+                    columns=[
+                        "Date",
+                        "Name",
+                        "Lastname",
+                        "Email",
+                        "Topic",
+                        "Description"]
+                )
+            df.to_csv("project/static/report.csv", sep='\t', encoding='utf-8')
             template = env.get_template("report.html")
             html_content = template.render(
                 queries=queries, name=request["session"].get("name")

@@ -48,4 +48,13 @@ def admin(*emails):
 
 
 if __name__ == '__main__' and connect():
+<<<<<<< HEAD
     globals()[sys.argv[1]](*sys.argv[2:])
+=======
+    register_university()
+    auth_as_admin(
+        "caaospinaca@unal.edu.co",
+        "dsvalenciah@unal.edu.co",
+        "msochel@unal.edu.co",
+    )
+>>>>>>> report
