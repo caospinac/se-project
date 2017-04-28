@@ -6,13 +6,16 @@
 <body onload="toDraw();">
 {% endblock %}
 
+<div class="row">
+
+<div id="mynetwork"></div>
+<!--p id="selection"></p-->
+</div>
+
 <script type="text/javascript">
     function toDraw() {
         draw({{nodes}}, {{edges}});
     }
 </script>
-
-<div id="mynetwork"></div>
-<p id="selection"></p>
 
 {% endblock %}

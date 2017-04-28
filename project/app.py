@@ -11,7 +11,7 @@ from sanic.exceptions import NotFound, FileNotFound
 from sanic.response import html, json, redirect
 from sanic_session import InMemorySessionInterface
 
-from config import database, SALT, server
+from config import database, SALT, server, PRODUCTION
 from models import (
     SciNet,
     Graph, Query, University, User, File, Result, Article
@@ -78,7 +78,9 @@ async def index(request):
 async def home(request):
     view = env.get_template("home.html")
     name = request['session'].get('name')
-    html_content = view.render(name=name) if name else view.render()
+    html_content = view.render(
+        name=name, role=request['session'].get('auth')
+    ) if name else view.render()
     return html(html_content)
 
 
@@ -180,7 +182,8 @@ async def query(request):
     if not user:
         view = env.get_template("graph.html")
         html_content = view.render(
-            nodes=data['nodes'], edges=data['edges'], time=time() - time_start
+            nodes=data['nodes'], edges=data['edges'], time=time() - time_start,
+            name=request["session"].get("name")
         )
         return html(html_content)
     try:
@@ -209,25 +212,35 @@ async def query(request):
                 resTime=time() - time_start,
                 graph=graph,
             )
-            graph = pyjson.loads(graph.graContent)
+            graph_data = pyjson.loads(graph.graContent)
             view = env.get_template("graph.html")
             html_content = view.render(
-                nodes=graph['nodes'], edges=graph['edges'], name=request["session"].get("name")
+                nodes=graph_data['nodes'], edges=graph_data['edges'],
+                name=request["session"].get("name")
             )
             return html(html_content)
     except Exception as e:
-        raise e
-    return redirect(
-        app.url_for("graph", graId=graph.graId)
-    )
+        return redirect(
+            app.url_for("query")
+        )
 
 
 @app.route("/report", methods=['POST', 'GET'])
 async def report(request):
+    user = request["session"].get("user")
+    name = request["session"].get("name")
+    auth = request["session"].get("auth")
+    if not user or auth != "adm":
+        return redirect(
+            app.url_for("index")
+        )
     req = request.args
+    print("req:", req)
     email = req['email'][0] if 'email' in req else None
-    date0 = req['date'][0] if 'date' in req else None
-    date1 = req['date'][1] if 'date' in req else None
+    date0 = datetime.strptime(req['min_date'][0], "%Y-%m-%d") \
+        if 'min_date' in req else None
+    date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
+        if 'max_date' in req else None
     try:
         with db_session:
             if email and date0 and date1:
@@ -252,6 +265,7 @@ async def report(request):
                 )
 
             elif date0 and date1:
+                print("dates:", date0, date1)
                 queries = select(
                     (
                         x.queId, x.queDate,
@@ -259,7 +273,7 @@ async def report(request):
                         x.queTopic, x.queDescription
                     )
                     for x in Query
-                    if date0 <= x.queDate <= date1
+                    if date0 <= x.queDate and x.queDate <= date1
                 )
             else:
                 queries = select(
@@ -271,7 +285,9 @@ async def report(request):
                     for x in Query
                 )
             template = env.get_template("report.html")
-            html_content = template.render(queries=queries)
+            html_content = template.render(
+                queries=queries, name=request["session"].get("name")
+            )
             return html(html_content)
     except Exception as e:
         raise e
@@ -284,19 +300,19 @@ async def report_user(request):
 if __name__ == '__main__':
     sql_debug(app.config.SQL_DEBUG)
     try:
-        SciNet.bind(
-            app.config.DB_CLIENT,
-            f"{app.config.DB_NAME}.sqlite", create_db=True
-        )
-        '''
-        SciNet.bind(
-            'postgres',
-            user=app.config.DB_USER,
-            password=app.config.DB_PASSWORD,
-            host=app.config.DB_HOST,
-            database=app.config.DB_NAME
-        )
-        '''
+        if not PRODUCTION:
+            SciNet.bind(
+                app.config.DB_CLIENT,
+                f"{app.config.DB_NAME}.sqlite", create_db=True
+            )
+        else:
+            SciNet.bind(
+                'postgres',
+                user=app.config.DB_USER,
+                password=app.config.DB_PASSWORD,
+                host=app.config.DB_HOST,
+                database=app.config.DB_NAME
+            )
     except Exception as e:
         raise e
     else:

@@ -15,7 +15,7 @@
   <div class="row">
     <div class="" enctype="multipart/form-data" action="/do">
       <div class="row form-content">
-        <form action="" class="form-inline" method="get" accept-charset="utf-8">
+        <form action="/report" class="form-inline" method="get" accept-charset="utf-8">
           <fieldset class="col-md-5 form-group">
             <div class="row">
               <label for="email">Email address</label><br>
@@ -26,8 +26,8 @@
           <fieldset class="col-md-5 form-group">
             <div class="row">
               <label for="email">Date range</label><br>
-              <input type="date" name="date[0]" value="" placeholder="">
-              <input type="date" name="date[1]" value="" placeholder="">
+              <input type="date" name="min_date" value="" placeholder="">
+              <input type="date" name="max_date" value="" placeholder="">
             </div>
           </fieldset>
           <fieldset class="col-md-2 form-group text-center">
@@ -55,7 +55,7 @@
   </div>
   {% for query in queries %}
   <div class="row list-group-item list-group-item-action">
-    <a href="/report/{{ query[0] }}" target="_blank">
+    <a href="#{{ query[0] }}" target="">
       <div class="col-md-2">{{ query[1] }}</div>
       <div class="col-md-2">{{ query[2] }}</div>
       <div class="col-md-2">{{ query[3] }}</div>
