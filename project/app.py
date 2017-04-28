@@ -66,7 +66,7 @@ def ignore_404s(request, exception):
     return html(html_content)
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/hola/mierda", methods=['GET', 'POST'])
 async def index(request):
     if request['session'].get('user'):
         url = app.url_for("home")
