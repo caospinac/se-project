@@ -150,12 +150,15 @@ async def sign_out(request):
     return redirect(url)
 
 
-def get_html_with_graph(nodes, edges):
+def get_html_with_graph(nodes, edges, time, name):
     view = env.get_template("graph.html")
     nodes = pyjson.loads(nodes)
     edges = pyjson.loads(edges)
     html_content = view.render(
-        nodes=pyjson.dumps(nodes), edges=pyjson.dumps(edges)
+        nodes=pyjson.dumps(nodes),
+        edges=pyjson.dumps(edges),
+        time=time,
+        name=name
     )
     return html(html_content)
 
@@ -173,8 +176,10 @@ async def query(request):
     user = request['session'].get('user')
     if not user:
         return get_html_with_graph(
-            data['nodes'],
-            data['edges']
+            nodes=data['nodes'],
+            edges=data['edges'],
+            time=time() - time_start,
+            name=request["session"].get("name")
         )
     try:
         # articles = []
@@ -203,8 +208,10 @@ async def query(request):
                 graph=graph,
             )
         return get_html_with_graph(
-            data['nodes'],
-            data['edges']
+            nodes=data['nodes'],
+            edges=data['edges'],
+            time=time() - time_start,
+            name=request["session"].get("name")
         )
     except Exception as e:
         raise e
