@@ -95,3 +95,6 @@ ENV/
 
 # Database
 *.sqlite
+
+# Data
+*.csv
