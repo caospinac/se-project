@@ -330,7 +330,7 @@ if __name__ == '__main__':
         raise e
     else:
         SciNet.generate_mapping(create_tables=True)
-
+    records.universities()
     app.run(
         debug=app.config.DEBUG,
         host=app.config.HOST,
