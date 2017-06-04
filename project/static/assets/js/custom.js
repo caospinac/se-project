@@ -32,15 +32,39 @@ $(function() {
             window.location.hash = hash;
         });
     });
+
     $.validator.addMethod("regx", function(value, element, regexpr) {          
       return regexpr.test(value);
     }, "Please enter a valid name.");
+
+    $.validator.addMethod('filesize', function(value, element, param) {
+      // param = size (in bytes) 
+      // element = element to validate (<input>)
+      // value = value of the element (file name)
+      return this.optional(element) || (element.files[0].size <= param) 
+    });
+
+    $('#query-form').submit(function(e){
+      console.log(e);
+      e.preventDefault();
+    });
+
+    $('#query-form').validate({
+      rules: {
+        file: { required: true, accept: "txt", filesize: 3500000 }
+      },
+      messages: {
+        file: "The file must be plain text (.txt) and should not exceed 3.5 Mb"
+      },
+      submitHandler: $(this).submit()
+    });
 
     $.validator.setDefaults({
       debug: false,
       success: "valid"
     });
-    $( "#sign-up-form" ).validate({
+
+    $("#sign-up-form" ).validate({
       rules: {
         "university": {
           required: true
@@ -68,7 +92,8 @@ $(function() {
           required: true,
           equalTo: "#password"
         }
-      }
+      },
+      submitHandler: $(this).submit()
     });
 
     $('#min_date, #max_date').val(new Date().toDateInputValue());
