@@ -1,5 +1,12 @@
 $(function() {
-                
+
+    Date.prototype.toDateInputValue = (function() {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0,10);
+    });
+
+
     // Navigation scrolls
     $('.navbar-nav li a').bind('click', function(event) {
         $('.navbar-nav li').removeClass('active');
@@ -63,5 +70,7 @@ $(function() {
         }
       }
     });
+
+    $('#min_date, #max_date').val(new Date().toDateInputValue());
 
 });

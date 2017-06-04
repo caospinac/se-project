@@ -14,10 +14,7 @@ from sanic.response import html, json, redirect
 from sanic_session import InMemorySessionInterface
 
 from config import database, SALT, server, PRODUCTION
-from models import (
-    SciNet,
-    Graph, Query, University, User, File, Result, Article
-)
+from models import *
 from scripts.isi_processor import TreeOfScience as ToS
 
 
@@ -66,7 +63,7 @@ def ignore_404s(request, exception):
     return html(html_content)
 
 
-@app.route("/hola/mierda", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 async def index(request):
     if request['session'].get('user'):
         url = app.url_for("home")
@@ -185,36 +182,27 @@ async def query(request):
             name=request["session"].get("name")
         )
     try:
-        # articles = []
+        articles = []
         req = request.form
         with db_session:
-            file = File(
-                filId=uuid4().hex,
-                filName=req_file.name,
-                filContent=body,
-            )
             query = Query(
                 queId=uuid4().hex,
                 queTopic=req.get('topic'),
                 queDescription=req.get('description'),
                 user=User[user],
-                file=file,
-            )
-            graph = Graph(
-                graId=uuid4().hex,
-                graContent=pyjson.dumps(data),
-                query=Query[query.queId]
             )
             result = Result(
                 resId=uuid4().hex,
+                resGraph=pyjson.dumps(data),
                 resTime=time() - time_start,
-                graph=graph,
+                articles=articles,
+                query=query,
             )
         return get_html_with_graph(
             nodes=data['nodes'],
             edges=data['edges'],
             time=time() - time_start,
-            name=request["session"].get("name")
+            name=request["session"].get("name"),
         )
     except Exception as e:
         raise e
