@@ -98,7 +98,6 @@ async def sign_in(request):
             us = User.select(lambda u: u.useEmail == email).first()
             login = pbkdf2_sha256.verify(f"{password}{SALT}", us.usePassword)
     except Exception as e:
-        raise e
         login = False
     if not login or not us:
         url = app.url_for('index')
@@ -188,36 +187,27 @@ async def query(request):
             name=request["session"].get("name")
         )
     try:
-        # articles = []
+        articles = []
         req = request.form
         with db_session:
-            file = File(
-                filId=uuid4().hex,
-                filName=req_file.name,
-                filContent=body,
-            )
             query = Query(
                 queId=uuid4().hex,
                 queTopic=req.get('topic'),
                 queDescription=req.get('description'),
                 user=User[user],
-                file=file,
-            )
-            graph = Graph(
-                graId=uuid4().hex,
-                graContent=pyjson.dumps(data),
-                query=Query[query.queId]
             )
             result = Result(
                 resId=uuid4().hex,
+                resGraph=pyjson.dumps(data),
                 resTime=time() - time_start,
-                graph=graph,
+                articles=articles,
+                query=query,
             )
         return get_html_with_graph(
             nodes=data['nodes'],
             edges=data['edges'],
             time=time() - time_start,
-            name=request["session"].get("name")
+            name=request["session"].get("name"),
         )
     except Exception as e:
         raise e
@@ -287,15 +277,15 @@ async def report(request):
             for x in queries:
                 list_report.append(x[1:])
             df = pd.DataFrame(
-                    list_report,
-                    columns=[
-                        "Date",
-                        "Name",
-                        "Lastname",
-                        "Email",
-                        "Topic",
-                        "Description"]
-                )
+                list_report,
+                columns=[
+                    "Date",
+                    "Name",
+                    "Lastname",
+                    "Email",
+                    "Topic",
+                    "Description"]
+            )
             df.to_csv("project/static/report.csv", sep='\t', encoding='utf-8')
             template = env.get_template("report.html")
             html_content = template.render(
