@@ -23,7 +23,7 @@ else:
 server = {
     'HOST': '0.0.0.0',
     'PORT': PORT,
-    'DEBUG': not PRODUCTION,
+    'DEBUG': True  # not PRODUCTION,
 }
 
 database = {
