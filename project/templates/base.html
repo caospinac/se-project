@@ -29,7 +29,7 @@
 
   {% block tag_body %}
   <body>
-  {% endblock %}
+  {% endblock tag_body %}
   {% block body %}
 
   <!-- Fixed navbar -->
@@ -41,7 +41,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <span class="navbar-brand" href="/">Science <span>network</span></spam>
+          <span class="navbar-brand">Science <span>network</span></spam>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -82,7 +82,7 @@
 				</div>				
 			</div>
 
-    {% endblock %}
+    {% endblock content %}
 		</div>
 	</div>
 	<div id="footer">
@@ -102,9 +102,21 @@
                     -->
                     <a href="https://github.com/carlosaospinac/se-project" target="_blank"><b>Source code</b></a> by
                     <ul class="list-inline">
-                      <li>Carlos A. Ospina</li>
-                      <li>Daniel S. Valencia</li>
-                      <li>Mauricio Soche</li>
+                      <li>
+                        <a href="https://github.com/carlosaospinac/" target="_blank">
+                          Carlos A. Ospina
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/msochel/" target="_blank">
+                          Mauricio Soche
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://github.com/dsvalenciah/" target="_blank">
+                          Daniel S. Valencia
+                        </a>
+                      </li>
                     </ul>
                 </div>
             </div>
@@ -112,7 +124,6 @@
 	</div>	
 	</div>
 
-  {% endblock %}
   <script src="/assets/js/jquery.min.js"></script>
   <script src="/assets/js/jquery.easing.min.js"></script>
   <script src="/assets/js/jquery.validate.min.js"></script>
@@ -120,6 +131,8 @@
   <script src="/assets/js/custom.js"></script>
   <script src="/assets/js/vis.js"></script>
   <script src="/assets/js/graph_drawer.js"></script>
-  {% endblock %}
+
+  {% endblock footer %}
+  {% endblock body %}
 </body>
 </html>
