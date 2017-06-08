@@ -14,10 +14,7 @@ from sanic.response import html, json, redirect
 from sanic_session import InMemorySessionInterface
 
 from config import database, SALT, server, PRODUCTION
-from models import (
-    SciNet,
-    Graph, Query, University, User, File, Result, Article
-)
+from models import *
 import records
 from scripts.isi_processor import TreeOfScience as ToS
 
