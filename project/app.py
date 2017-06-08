@@ -186,8 +186,8 @@ async def query(request):
         with db_session:
             query = Query(
                 queId=uuid4().hex,
-                queTopic=req.get('topic'),
-                queDescription=req.get('description'),
+                queTopic=req.get('topic').strip () if req.get('topic') else None,
+                queDescription=req.get('description').strip() if req.get('description') else None,
                 user=User[user],
             )
             result = Result(
@@ -204,7 +204,7 @@ async def query(request):
             name=request["session"].get("name"),
         )
     except Exception as e:
-        raise e
+        app.url_for("index")
 
 
 
