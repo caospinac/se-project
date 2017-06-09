@@ -83,7 +83,7 @@ async def home(request):
     return html(html_content)
 
 
-@app.route("/sign-in", methods=['POST'])
+@app.route("/sign-in", methods=['POST', 'GET'])
 async def sign_in(request):
     req = request.form
     email = req.get('email')
@@ -96,7 +96,9 @@ async def sign_in(request):
     except Exception as e:
         login = False
     if not login or not us:
-        url = app.url_for('index')
+        view = env.get_template("base.html")
+        html_content = view.render(msg="Incorrect email or password")
+        return html(html_content)
     else:
         request['session']['user'] = us.useId
         request['session']['name'] = us.useName
