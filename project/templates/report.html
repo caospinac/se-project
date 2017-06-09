@@ -35,7 +35,13 @@
               <button type="submit" class="btn">Filter results</button>
             </div>
             <div class="row">
-              <a href="/report.csv" class="btn btn-theme">Download report</a>
+              {% if queries %}
+              <a href="/report.csv" class="btn btn-theme">
+              {% else %}
+              <a href="#" class="btn btn-theme" disabled>
+              {% endif %}
+                Download report
+              </a>
             </div>
           </fieldset>
         </form>
