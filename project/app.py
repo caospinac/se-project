@@ -166,20 +166,21 @@ def get_html_with_graph(nodes, edges, time, name):
 
 @app.route('/graph/<graph_id>')
 async def graph(request, graph_id):
+    view = env.get_template("home.html")
     time_start = time()
     graph = None
     try:
         with db_session:
             graph = Result.select(lambda r: r.resId == graph_id).first()
     except Exception:
-        # Show error template "An error was occurred in data load"
+        view_default = view.render(msg="An error was occurred in data load")
         pass
     if graph:
         graph_data = {
             "nodes": pyjson.loads(graph.resGraph)["nodes"],
             "edges": pyjson.loads(graph.resGraph)["edges"]
         }
-        print("nolas", graph_data)
+        # print("nolas", graph_data)
         return get_html_with_graph(
             nodes=graph_data["nodes"],
             edges=graph_data["edges"],
@@ -187,8 +188,8 @@ async def graph(request, graph_id):
             name=request["session"].get("name")
         )
     else:
-        # Show error template "Graph not found"
-        return redirect(app.url_for("index"))
+        view_default = view.render(msg="Graph not found")
+    return html(view_default)
 
 
 def save_query(req, graph_data, total_time, user):
@@ -219,7 +220,7 @@ def save_query(req, graph_data, total_time, user):
                 articles=list(),
                 query=query,
             )
-            return True
+            return result.resId
     except Exception as e:
         return None
 
@@ -229,7 +230,8 @@ async def query(request):
     view = env.get_template("home.html")
     req_file = request.files.get('file')
     if not req_file:
-        return redirect(app.url_for("query"))  # An error in file upload
+        view_default = view.render(msg="An error in file upload")
+        return html(view_default)
     time_start = time()
     body = req_file.body.decode("unicode_escape")
     tos = ToS(body)
@@ -243,15 +245,13 @@ async def query(request):
                 time=time() - time_start,
                 name=request["session"].get("name")
             )
-        if save_query(request.form, graph_data, time() - time_start, user):
-            return get_html_with_graph(
-                nodes=graph_data["nodes"],
-                edges=graph_data["edges"],
-                time=time() - time_start,
-                name=request["session"].get("name"),
+        graph = save_query(request.form, graph_data, time() - time_start, user)
+        if graph:
+            return redirect(
+                app.url_for('graph', graph_id=graph)
             )
         else:
-            view_default = view.render()  # An error in query save
+            view_default = view.render(msg="An error in query save")
     else:
         view_default = view.render(msg=graph_data["status"])
     return html(view_default)
@@ -267,7 +267,7 @@ async def report(request):
             app.url_for("index")
         )
     req = request.args
-    print("req:", req)
+    # print("req:", req)
     email = req['email'][0] if 'email' in req else None
 
     try:
@@ -302,7 +302,7 @@ async def report(request):
                 )
 
             elif date0 and date1:
-                print("dates:", date0, date1)
+                # print("dates:", date0, date1)
                 queries = select(
                     (
                         x.queId, x.queDate,
