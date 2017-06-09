@@ -84,7 +84,7 @@ async def home(request):
     return html(html_content)
 
 
-@app.route("/sign-in", methods=['POST'])
+@app.route("/sign-in", methods=['POST', 'GET'])
 async def sign_in(request):
     req = request.form
     email = req.get('email')
@@ -97,7 +97,9 @@ async def sign_in(request):
     except Exception as e:
         login = False
     if not login or not us:
-        url = app.url_for('index')
+        view = env.get_template("base.html")
+        html_content = view.render(msg="Incorrect email or password")
+        return html(html_content)
     else:
         request['session']['user'] = us.useId
         request['session']['name'] = us.useName
@@ -165,50 +167,97 @@ def get_html_with_graph(nodes, edges, time, name):
     return html(html_content)
 
 
-@app.route("/query", methods=['POST', 'GET'])
-async def query(request):
-    req_file = request.files.get('file')
-    if not req_file:
-        return redirect(app.url_for("query"))
+@app.route('/graph/<graph_id>')
+async def graph(request, graph_id):
+    view = env.get_template("home.html")
     time_start = time()
-    body = req_file.body.decode("unicode_escape")
-    tos = ToS(body)
-    nodes, edges = tos.get_graph()
-    data = {"nodes": nodes, "edges": edges}
-    user = request['session'].get('user')
-    if not user:
+    graph = None
+    try:
+        with db_session:
+            graph = Result.select(lambda r: r.resId == graph_id).first()
+    except Exception:
+        view_default = view.render(msg="An error was occurred in data load")
+        pass
+    if graph:
+        graph_data = {
+            "nodes": pyjson.loads(graph.resGraph)["nodes"],
+            "edges": pyjson.loads(graph.resGraph)["edges"]
+        }
+        # print("nolas", graph_data)
         return get_html_with_graph(
-            nodes=data['nodes'],
-            edges=data['edges'],
+            nodes=graph_data["nodes"],
+            edges=graph_data["edges"],
             time=time() - time_start,
             name=request["session"].get("name")
         )
+    else:
+        view_default = view.render(msg="Graph not found")
+    return html(view_default)
+
+
+def save_query(req, graph_data, total_time, user):
+    validate_value = lambda value: value.strip() if value else None
     try:
-        articles = []
-        req = request.form
         with db_session:
             query = Query(
-                queId=uuid4().hex,
-                queTopic=req.get('topic').strip () if req.get('topic') else None,
-                queDescription=req.get('description').strip() if req.get('description') else None,
-                user=User[user],
+                **not_null_data(
+                    queId=uuid4().hex,
+                    queTopic=validate_value(
+                        req.get('topic').strip()
+                    ),
+                    queDescription=validate_value(
+                        req.get('description').strip()
+                    ),
+                    user=User[user],
+                )
             )
             result = Result(
                 resId=uuid4().hex,
-                resGraph=pyjson.dumps(data),
-                resTime=time() - time_start,
-                articles=articles,
+                resGraph=pyjson.dumps(
+                    {
+                        "nodes": graph_data["nodes"],
+                        "edges": graph_data["edges"]
+                    }
+                ),
+                resTime=total_time,
+                articles=list(),
                 query=query,
             )
-        return get_html_with_graph(
-            nodes=data['nodes'],
-            edges=data['edges'],
-            time=time() - time_start,
-            name=request["session"].get("name"),
-        )
+            return result.resId
     except Exception as e:
-        app.url_for("index")
+        return None
 
+
+@app.route("/query", methods=['POST', 'GET'])
+async def query(request):
+    view = env.get_template("home.html")
+    req_file = request.files.get('file')
+    if not req_file:
+        view_default = view.render(msg="An error in file upload")
+        return html(view_default)
+    time_start = time()
+    body = req_file.body.decode("unicode_escape")
+    tos = ToS(body)
+    graph_data = tos.get_graph()
+    if graph_data["status"] == "OK":
+        user = request['session'].get('user')
+        if not user:
+            return get_html_with_graph(
+                nodes=graph_data["nodes"],
+                edges=graph_data["edges"],
+                time=time() - time_start,
+                name=request["session"].get("name")
+            )
+        graph = save_query(request.form, graph_data, time() - time_start, user)
+        if graph:
+            return redirect(
+                app.url_for('graph', graph_id=graph)
+            )
+        else:
+            view_default = view.render(msg="An error in query save")
+    else:
+        view_default = view.render(msg=graph_data["status"])
+    return html(view_default)
 
 
 @app.route("/report", methods=['POST', 'GET'])
@@ -221,14 +270,15 @@ async def report(request):
             app.url_for("index")
         )
     req = request.args
-    print("req:", req)
+    # print("req:", req)
     email = req['email'][0] if 'email' in req else None
-    date0 = datetime.strptime(req['min_date'][0], "%Y-%m-%d") \
-        if 'min_date' in req else None
-    date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
-        if 'max_date' in req else None
-    list_report = list()
+
     try:
+        date0 = datetime.strptime(req['min_date'][0], "%Y-%m-%d") \
+            if 'min_date' in req else None
+        date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
+            if 'max_date' in req else None
+        list_report = list()
         with db_session:
             if email and date0 and date1:
                 queries = select(
@@ -238,7 +288,10 @@ async def report(request):
                         x.queTopic, x.queDescription
                     )
                     for x in Query
-                    if x.user.useEmail == email and date0 <= x.queDate <= date1
+                    if (
+                        email in x.user.useEmail and
+                        date0 <= x.queDate and x.queDate <= date1
+                    )
                 )
             elif email:
                 queries = select(
@@ -248,11 +301,11 @@ async def report(request):
                         x.queTopic, x.queDescription
                     )
                     for x in Query
-                    if x.user.useEmail == email
+                    if email in x.user.useEmail
                 )
 
             elif date0 and date1:
-                print("dates:", date0, date1)
+                # print("dates:", date0, date1)
                 queries = select(
                     (
                         x.queId, x.queDate,
@@ -290,7 +343,7 @@ async def report(request):
             )
             return html(html_content)
     except Exception as e:
-        raise e
+        return redirect(app.url_for("report"))
 
 
 async def report_user(request):

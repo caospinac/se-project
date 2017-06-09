@@ -14,14 +14,14 @@ $(function() {
       var $anchor = $(this);
       var nav = $($anchor.attr('href'));
       if (nav.length) {
-      $('html, body').stop().animate({        
-          scrollTop: $($anchor.attr('href')).offset().top       
+      $('html, body').stop().animate({
+          scrollTop: $($anchor.attr('href')).offset().top
       }, 1500, 'easeInOutExpo');
 
       event.preventDefault();
       }
   });
-  
+
   // Add smooth scrolling to all links in navbar
   $(".navbar a, a.mouse-hover, .overlay-detail a").on('click', function(event) {
       event.preventDefault();
@@ -33,7 +33,7 @@ $(function() {
       });
   });
 
-  $.validator.addMethod("regx", function(value, element, regexpr) {          
+  $.validator.addMethod("regx", function(value, element, regexpr) {
     return regexpr.test(value);
   }, "Please enter a valid name.");
 
@@ -105,6 +105,10 @@ $(function() {
     submitHandler: $(this).submit()
   });
 
-  $('#min_date, #max_date').val(new Date().toDateInputValue());
+  $('#max_date').val(new Date().toDateInputValue());
+
+  $('#min_date').change(function(e) {
+    $('#send').removeAttr('disabled');
+  });
 
 });

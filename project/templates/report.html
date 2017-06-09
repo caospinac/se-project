@@ -19,8 +19,8 @@
           <fieldset class="col-md-5 form-group">
             <div class="row">
               <label for="email">Email address</label><br>
-              <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" autocomplete="off">
-              <small class="text-muted">It will only be a user.</small>
+              <input type="text" class="form-control" id="email" placeholder="Enter email" name="email" autocomplete="off">
+              <small class="text-muted">By user.</small>
             </div>
           </fieldset>
           <fieldset class="col-md-5 form-group">
@@ -32,10 +32,16 @@
           </fieldset>
           <fieldset class="col-md-2 form-group text-center">
             <div class="row">
-              <button type="submit" class="btn">Filter results</button>
+              <button type="submit" id="send" class="btn" disabled>Filter results</button>
             </div>
             <div class="row">
-              <a href="/report.csv" class="btn btn-theme">Download report</a>
+              {% if queries %}
+              <a href="/report.csv" class="btn btn-theme">
+              {% else %}
+              <a href="#" class="btn btn-theme" disabled>
+              {% endif %}
+                Download report
+              </a>
             </div>
           </fieldset>
         </form>
@@ -65,6 +71,10 @@
     </a>
   </div>
   {% endfor %}
+</div>
+{% else %}
+<div class="al alert alert-warning" role="alert">
+  No results
 </div>
 {% endif %}
 

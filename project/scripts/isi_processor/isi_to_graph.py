@@ -1,4 +1,4 @@
-from pprint import pprint
+from time import time
 import json
 import re
 
@@ -11,15 +11,14 @@ class TreeOfScience():
     def __init__(self, txt):
         self.graph = ig.Graph()
         self.txt = txt
-        self.configure()
 
     def __build_graph(self):
-        entries = get_entries(self.txt.split('\nER\n\n'))
-        labels = get_label_list(entries)
+        self.entries = get_entries(self.txt.split('\nER\n\n'))
+        labels = get_label_list(self.entries)
 
         duplicates = detect_duplicate_labels(labels)
         unique_labels = list(set(patch_list(labels, duplicates)))
-        edge_relations = extract_edge_relations(entries)
+        edge_relations = extract_edge_relations(self.entries)
         unique_edge_relations = list(set(
             patch_tuple_list(edge_relations, duplicates)
         ))
@@ -180,38 +179,35 @@ class TreeOfScience():
         return tree_graph
 
     def get_graph(self):
-        tree_graph = self.get_tree_graph()
-        nodes = [
-            vs.attributes()
-            for vs in tree_graph.vs
-        ]
+        try:
+            self.configure()
+            tree_graph = self.get_tree_graph()
+        except Exception:
+            return {"status": "Incorrect file content"}
 
-        edges = [
-            {
-                "from": es.tuple[0],
-                "to": es.tuple[1],
-                "arrows":'to'
+        if len(self.entries) >= 90 and  len(self.entries) <=500:
+            nodes = [
+                vs.attributes()
+                for vs in tree_graph.vs
+            ]
+
+            edges = [
+                {
+                    "from": es.tuple[0],
+                    "to": es.tuple[1],
+                    "arrows":'to'
+                }
+                for es in tree_graph.es
+            ]
+
+            return {
+                "nodes": json.dumps(nodes),
+                "edges": json.dumps(edges),
+                "status": "OK"
             }
-            for es in tree_graph.es
-        ]
-        return json.dumps(nodes), json.dumps(edges)
 
+        elif len(self.entries) < 90:
+            return {"status": "Very small file"}
 
-if __name__ == '__main__':
-    tree = TreeOfScience(
-        open(
-            'Entrepreneurial Marketing 120ART 22-OCT-16.txt',
-            'r'
-        ).read()
-    )
-
-    tree.get_html_graph()
-
-    with open("resulting_graph.html", "w+") as fh:
-        fh.write(tree.get_html_graph())
-    print('Leave:')
-    pprint([tree.graph.vs['title'][x] for x in tree.leave()])
-    print('Trunk:')
-    pprint([tree.graph.vs['title'][x] for x in tree.trunk()])
-    print('Root:')
-    pprint([tree.graph.vs['title'][x] for x in tree.root()])
+        else:
+            return {"status": "Very large file"}
