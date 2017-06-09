@@ -185,10 +185,12 @@ async def query(request):
         req = request.form
         with db_session:
             query = Query(
-                queId=uuid4().hex,
-                queTopic=req.get('topic').strip () if req.get('topic') else None,
-                queDescription=req.get('description').strip() if req.get('description') else None,
-                user=User[user],
+                **not_null_data(
+                    queId=uuid4().hex,
+                    queTopic=req.get('topic').strip() if req.get('topic') else None,
+                    queDescription=req.get('description').strip() if req.get('description') else None,
+                    user=User[user],
+                )
             )
             result = Result(
                 resId=uuid4().hex,
