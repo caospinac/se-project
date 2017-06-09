@@ -162,51 +162,81 @@ def get_html_with_graph(nodes, edges, time, name):
     return html(html_content)
 
 
-@app.route("/query", methods=['POST', 'GET'])
-async def query(request):
-    req_file = request.files.get('file')
-    if not req_file:
-        return redirect(app.url_for("query"))
-    time_start = time()
-    body = req_file.body.decode("unicode_escape")
-    tos = ToS(body)
-    nodes, edges = tos.get_graph()
-    data = {"nodes": nodes, "edges": edges}
-    user = request['session'].get('user')
-    if not user:
-        return get_html_with_graph(
-            nodes=data['nodes'],
-            edges=data['edges'],
-            time=time() - time_start,
-            name=request["session"].get("name")
-        )
+def save_query(req, graph_data, total_time, user):
+    validate_value = lambda value: value.strip() if value else None
     try:
-        articles = []
-        req = request.form
         with db_session:
             query = Query(
                 **not_null_data(
                     queId=uuid4().hex,
-                    queTopic=req.get('topic').strip() if req.get('topic') else None,
-                    queDescription=req.get('description').strip() if req.get('description') else None,
+                    queTopic=validate_value(
+                        req.get('topic').strip()
+                    ),
+                    queDescription=validate_value(
+                        req.get('description').strip()
+                    ),
                     user=User[user],
                 )
             )
             result = Result(
                 resId=uuid4().hex,
-                resGraph=pyjson.dumps(data),
-                resTime=time() - time_start,
-                articles=articles,
+                resGraph=pyjson.dumps(
+                    {
+                        "nodes": graph_data["nodes"],
+                        "edges": graph_data["edges"]
+                    }
+                ),
+                resTime=total_time,
+                articles=list(),
                 query=query,
             )
-        return get_html_with_graph(
-            nodes=data['nodes'],
-            edges=data['edges'],
-            time=time() - time_start,
-            name=request["session"].get("name"),
-        )
+            return True
     except Exception as e:
-        return redirect(app.url_for("index"))
+        return None
+
+
+@app.route("/query", methods=['POST', 'GET'])
+async def query(request):
+    req_file = request.files.get('file')
+    if not req_file:
+        return redirect(app.url_for("query")) # An error in file upload
+    time_start = time()
+    body = req_file.body.decode("unicode_escape")
+    tos = ToS(body)
+    graph_data = tos.get_graph()
+    if graph_data["status"] == "OK":
+        user = request['session'].get('user')
+        if not user:
+            return get_html_with_graph(
+                nodes=graph_data["nodes"],
+                edges=graph_data["edges"],
+                time=time() - time_start,
+                name=request["session"].get("name")
+            )
+        if save_query(request.form, graph_data, time() - time_start, user):
+            return get_html_with_graph(
+                nodes=graph_data["nodes"],
+                edges=graph_data["edges"],
+                time=time() - time_start,
+                name=request["session"].get("name"),
+            )
+        else:
+            return redirect(app.url_for("index")) # An error in query save
+            # Add template for this action
+
+    elif graph_data["status"] == "Incorrect file content":
+        # Add template for this action
+        pass
+
+    elif graph_data["status"] == "Very small file":
+        # Add template for this action
+        pass
+
+    elif graph_data["status"] == "Very large file":
+        # Add template for this action
+        pass
+
+    return redirect(app.url_for("index")) # Temporal line...
 
 
 @app.route("/report", methods=['POST', 'GET'])
