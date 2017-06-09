@@ -204,8 +204,7 @@ async def query(request):
             name=request["session"].get("name"),
         )
     except Exception as e:
-        app.url_for("index")
-
+        return redirect(app.url_for("index"))
 
 
 @app.route("/report", methods=['POST', 'GET'])
@@ -220,12 +219,13 @@ async def report(request):
     req = request.args
     print("req:", req)
     email = req['email'][0] if 'email' in req else None
-    date0 = datetime.strptime(req['min_date'][0], "%Y-%m-%d") \
-        if 'min_date' in req else None
-    date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
-        if 'max_date' in req else None
-    list_report = list()
+
     try:
+        date0 = datetime.strptime(req['min_date'][0], "%Y-%m-%d") \
+            if 'min_date' in req else None
+        date1 = datetime.strptime(req['max_date'][0], "%Y-%m-%d") \
+            if 'max_date' in req else None
+        list_report = list()
         with db_session:
             if email and date0 and date1:
                 queries = select(
@@ -235,7 +235,10 @@ async def report(request):
                         x.queTopic, x.queDescription
                     )
                     for x in Query
-                    if x.user.useEmail == email and date0 <= x.queDate <= date1
+                    if (
+                        email in x.user.useEmail and
+                        date0 <= x.queDate and x.queDate <= date1
+                    )
                 )
             elif email:
                 queries = select(
@@ -245,7 +248,7 @@ async def report(request):
                         x.queTopic, x.queDescription
                     )
                     for x in Query
-                    if x.user.useEmail == email
+                    if email in x.user.useEmail
                 )
 
             elif date0 and date1:
@@ -287,7 +290,7 @@ async def report(request):
             )
             return html(html_content)
     except Exception as e:
-        raise e
+        return redirect(app.url_for("report"))
 
 
 async def report_user(request):
