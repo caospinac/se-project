@@ -164,6 +164,33 @@ def get_html_with_graph(nodes, edges, time, name):
     return html(html_content)
 
 
+@app.route('/graph/<graph_id>')
+async def graph(request, graph_id):
+    time_start = time()
+    graph = None
+    try:
+        with db_session:
+            graph = Result.select(lambda r: r.resId == graph_id).first()
+    except Exception:
+        # Show error template "An error was occurred in data load"
+        pass
+    if graph:
+        graph_data = {
+            "nodes": pyjson.loads(graph.resGraph)["nodes"],
+            "edges": pyjson.loads(graph.resGraph)["edges"]
+        }
+        print("nolas", graph_data)
+        return get_html_with_graph(
+            nodes=graph_data["nodes"],
+            edges=graph_data["edges"],
+            time=time() - time_start,
+            name=request["session"].get("name")
+        )
+    else:
+        # Show error template "Graph not found"
+        return redirect(app.url_for("index"))
+
+
 def save_query(req, graph_data, total_time, user):
     validate_value = lambda value: value.strip() if value else None
     try:
