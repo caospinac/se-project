@@ -199,9 +199,10 @@ def save_query(req, graph_data, total_time, user):
 
 @app.route("/query", methods=['POST', 'GET'])
 async def query(request):
+    view = env.get_template("home.html")
     req_file = request.files.get('file')
     if not req_file:
-        return redirect(app.url_for("query")) # An error in file upload
+        return redirect(app.url_for("query"))  # An error in file upload
     time_start = time()
     body = req_file.body.decode("unicode_escape")
     tos = ToS(body)
@@ -223,22 +224,10 @@ async def query(request):
                 name=request["session"].get("name"),
             )
         else:
-            return redirect(app.url_for("index")) # An error in query save
-            # Add template for this action
-
-    elif graph_data["status"] == "Incorrect file content":
-        # Add template for this action
-        pass
-
-    elif graph_data["status"] == "Very small file":
-        # Add template for this action
-        pass
-
-    elif graph_data["status"] == "Very large file":
-        # Add template for this action
-        pass
-
-    return redirect(app.url_for("index")) # Temporal line...
+            view_default = view.render()  # An error in query save
+    else:
+        view_default = view.render(msg=graph_data["status"])
+    return html(view_default)
 
 
 @app.route("/report", methods=['POST', 'GET'])
