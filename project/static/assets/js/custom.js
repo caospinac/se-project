@@ -105,6 +105,6 @@ $(function() {
     submitHandler: $(this).submit()
   });
 
-  $('#min_date, #max_date').val(new Date().toDateInputValue());
+  $('#max_date').val(new Date().toDateInputValue());
 
 });
