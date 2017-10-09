@@ -1,3 +1,3 @@
 # Software engineering project
 
-Host: scinetwork.herokuapp.com
+Host: scinetwork-0720.herokuapp.com
