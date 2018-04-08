@@ -1,7 +1,7 @@
-project/static/assets/js/bootstrap.*
-project/static/assets/js/jquery.*
-project/static/assets/js/vis.*
+project/static/assets/js/bootstrap.* linguist-vendored
+project/static/assets/js/jquery.* linguist-vendored
+project/static/assets/js/vis.* linguist-vendored
 
-project/static/assets/css/font-awesome.*
-project/static/assets/css/bootstrap*
-project/static/assets/css/vis*
+project/static/assets/css/font-awesome.* linguist-vendored
+project/static/assets/css/bootstrap* linguist-vendored
+project/static/assets/css/vis* linguist-vendored
